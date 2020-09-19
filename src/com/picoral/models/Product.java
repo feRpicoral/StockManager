@@ -1,9 +1,6 @@
 package com.picoral.models;
 
 import com.picoral.controller.Util;
-
-import javax.imageio.ImageIO;
-import java.net.URL;
 import java.util.Arrays;
 
 public class Product {
@@ -39,7 +36,7 @@ public class Product {
         }
 
         //Category
-        if (Arrays.asList(Util.possibleCategories).contains(category.toLowerCase())) {
+        if (Arrays.asList(Util.possibleCategories).contains(category)) {
             this.category = category;
         }
 
@@ -63,16 +60,11 @@ public class Product {
             this.quantity = quantity;
         }
 
-        //Image
-        if (imageURL != null) {
-            try {
-
-                if (ImageIO.read(new URL(imageURL)) != null) {
-
-                    this.imageURL = imageURL;
-                }
-
-            } catch (Exception ignored) {}
+        //Image url
+        if (Util.isURLImage(imageURL)) {
+            this.imageURL = imageURL;
+        } else {
+            this.imageURL = null;
         }
 
     }
@@ -128,6 +120,23 @@ public class Product {
         }
 
     }
+
+    //To String - debug only
+    @Override
+    public String toString() {
+        return "Product {" +
+                "name='" + name + '\'' +
+                ", ID='" + ID + '\'' +
+                ", price=" + price +
+                ", category='" + category + '\'' +
+                ", model='" + model + '\'' +
+                ", brand='" + brand + '\'' +
+                ", warranty='" + warranty + '\'' +
+                ", quantity=" + quantity +
+                ", imageURL='" + imageURL + '\'' +
+                '}';
+    }
+
 
     //Getters & Setters
 
@@ -210,7 +219,8 @@ public class Product {
     }
 
     public void setImageURL(String imageURL) {
-        //TODO Verify if it's an url
-        this.imageURL = imageURL;
+        if (Util.isURLImage(imageURL)) {
+            this.imageURL = imageURL;
+        }
     }
 }

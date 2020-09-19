@@ -1,12 +1,36 @@
 package com.picoral.controller;
 
+import javax.imageio.ImageIO;
+import java.net.URL;
+
 public abstract class Util {
 
-    //All possible product categories in lower case
+    //All possible product categories
+    //TODO Move this to an external file
     public static final String[] possibleCategories = new String[]{
-            "smart phone",
-            "watch",
-            "tv",
-            "computer"
+            "Smart Phone",
+            "Watch",
+            "TV",
+            "Computer"
     };
+
+    //URL validation methods
+    public static boolean isURLValid(String url) {
+        try {
+            (new URL(url)).openStream().close();
+            return true;
+        } catch (Exception ignored) { }
+
+        return false;
+    }
+
+    public static boolean isURLImage(String url) {
+        try {
+            return isURLValid(url) && ImageIO.read(new URL(url)) != null;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+
 }
