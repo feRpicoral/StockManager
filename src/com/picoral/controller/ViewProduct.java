@@ -80,7 +80,7 @@ public class ViewProduct {
 
             if (product.hasImage()) {
                 noImgLabel.setVisible(false);
-                imageView.setImage(new Image(product.getImageURL()));
+                imageView.setImage(product.getImage());
             }
 
 

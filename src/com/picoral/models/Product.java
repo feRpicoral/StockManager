@@ -1,6 +1,9 @@
 package com.picoral.models;
 
 import com.picoral.controller.Util;
+import javafx.scene.image.Image;
+
+import java.io.InputStream;
 import java.util.Arrays;
 
 public class Product {
@@ -14,11 +17,12 @@ public class Product {
     private String warranty;
     private int quantity;
     private String imageURL;
+    private Image image;
 
     /**
-     * Default constructor
+     * Main constructor
      */
-    public Product(String name, String ID, double price, String category, String model, String brand, String warranty, int quantity, String imageURL) {
+    public Product(String name, String ID, double price, String category, String model, String brand, String warranty, int quantity, Image image, String imageURL) {
 
         //Name
         if (!name.isBlank()) {
@@ -60,11 +64,17 @@ public class Product {
             this.quantity = quantity;
         }
 
-        //Image url
-        if (Util.isURLImage(imageURL)) {
-            this.imageURL = imageURL;
-        } else {
-            this.imageURL = null;
+        //Image
+
+        this.image = image;
+        this.imageURL = imageURL;
+
+        if (!imageURL.isBlank() && image == null) {
+
+            try {
+                this.image = new Image(imageURL);
+            } catch (Exception ignored) {}
+
         }
 
     }
@@ -73,8 +83,23 @@ public class Product {
      * Constructor without the image URL
      */
     public Product(String name, String ID, double price, String category, String model, String brand, String warranty, int quantity) {
-        this(name, ID, price, category, model, brand, warranty, quantity, null);
+        this(name, ID, price, category, model, brand, warranty, quantity, null,"");
     }
+
+    /**
+     * Constructor with image URL
+     */
+    public Product(String name, String ID, double price, String category, String model, String brand, String warranty, int quantity, String imageURL) {
+        this(name, ID, price, category, model, brand, warranty, quantity, null, imageURL);
+    }
+
+    /**
+     * Constructor with image as image object
+     */
+    public Product(String name, String ID, double price, String category, String model, String brand, String warranty, int quantity, Image image) {
+        this(name, ID, price, category, model, brand, warranty, quantity, image, "");
+    }
+
 
 
     /**
@@ -215,9 +240,19 @@ public class Product {
     }
 
     public String getImageURL() {
-        return imageURL;
+        if (imageURL.isBlank() && image != null) {
+            return image.getUrl();
+        } else {
+            return imageURL;
+        }
     }
 
+    /**
+     * Set the image as the image in the given URL
+     *
+     * @deprecated
+     * @param imageURL URL of a image.
+     */
     public void setImageURL(String imageURL) {
         if (Util.isURLImage(imageURL)) {
             this.imageURL = imageURL;
@@ -225,6 +260,14 @@ public class Product {
     }
 
     public boolean hasImage() {
-        return Util.isURLImage(imageURL);
+        return image != null;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
 }

@@ -17,10 +17,10 @@ public abstract class Util {
     //Path to the JSON where the data will be stored
     //The file doesn't need to exist - if it doesn't it will be created
     //Change to sample_data.json to quick test with a few products but don't remove them
-    public static final String DATA_FILE_PATH = "data.json";
+    public static final String DATA_FILE_PATH = "sample_data.json";
 
     //URL validation methods
-    private static boolean isURLValid(String url) {
+    public static boolean isURLValid(String url) {
         try {
             (new URL(url)).openStream().close();
             return true;

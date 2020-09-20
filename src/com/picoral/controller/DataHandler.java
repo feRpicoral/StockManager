@@ -4,6 +4,7 @@ import com.picoral.App;
 import com.picoral.models.Product;
 import javafx.scene.control.TableView;
 
+import javafx.scene.image.Image;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -50,9 +50,6 @@ public class MainController extends ScrollPane {
     private MenuItem btnClose;
 
     @FXML
-    private MenuItem btnAbout;
-
-    @FXML
     private TableView<Product> table;
 
     @FXML
@@ -261,11 +258,6 @@ public class MainController extends ScrollPane {
             new RemoveBox(dataHandler);
         });
 
-        //About program
-        btnAbout.setOnAction(e -> {
-
-        });
-
         //End of MenuBar buttons
 
         //Load image preview
@@ -273,26 +265,44 @@ public class MainController extends ScrollPane {
             previewImage();
         });
 
-        //Assure price is numbers only
-        //TODO Improve dot verification
+        //Only allow numbers and dots to the price
+        //Also, only allow two numbers after the dot
         price.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 
-                int count = 0;
-                for (char c : newValue.toCharArray()) {
-                    if (c == '.') {
-                        count++;
+                if (newValue.contains(".")) {
+
+                    int counter = 0;
+                    for (char c : oldValue.toCharArray()) {
+                        if (c == '.') {
+                            counter++;
+                        }
                     }
+
+                    if (counter == 0) {
+                        price.setText(newValue.replaceAll("[^\\d+\\.+[0-9]{1,2}]", ""));
+                    } else {
+
+                        int dotIndex = newValue.indexOf(".");
+                        String beforeDot = newValue.substring(0, dotIndex);
+                        String afterDot = newValue.substring(dotIndex + 1);
+                        afterDot = afterDot.replaceAll("\\D", "");
+
+                        if (afterDot.length() > 2) {
+                            afterDot = String.valueOf(afterDot.charAt(0)) + afterDot.charAt(1);
+                        }
+
+                        price.setText(beforeDot + "." + afterDot);
+
+                    }
+
+                } else {
+
+                    price.setText(newValue.replaceAll("\\D", ""));
+
                 }
 
-                if (count > 0) {
-                    newValue = newValue.substring(0, newValue.length() - 1);
-                }
-
-                if (!newValue.matches("\\d*\\.?\\d*")) {
-                    price.setText(newValue.replaceAll("[^\\d*\\.?\\d*]", ""));
-                }
             }
         });
 
@@ -332,6 +342,7 @@ public class MainController extends ScrollPane {
                 brand.getText(),
                 warranty.getText(),
                 Integer.parseInt(quantity.getText()),
+                imgPreview.getImage(),
                 imgURL.getText()
         );
 
@@ -379,16 +390,16 @@ public class MainController extends ScrollPane {
 
     /**
      * Load the image preview when the url is typed
-     * TODO Only load the image once in the whole program to increase performance
      */
     private void previewImage() {
-        if (Util.isURLImage(imgURL.getText())) {
-            imgPreview.setImage(new Image(
-                    imgURL.getText()
-            ));
-        } else {
-            imgPreview.setImage(null);
-        }
+
+        try {
+            Image img = new Image(imgURL.getText());
+            imgPreview.setImage(img);
+
+        } catch (Exception ignored) {}
+
+
     }
 
     /**
