@@ -23,10 +23,16 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
-                    <MenuItem fx:id="btnResetData" mnemonicParsing="false" text="Reset Data" />
                         <MenuItem fx:id="btnClose" mnemonicParsing="false" text="Close" />
                   </items>
                 </Menu>
+                  <Menu mnemonicParsing="false" text="Products">
+                     <items>
+                        <MenuItem fx:id="btnAddNew" mnemonicParsing="false" text="Add New" />
+                        <MenuItem fx:id="btnRemoveByID" mnemonicParsing="false" text="Remove by ID" />
+                    <MenuItem fx:id="btnResetData" mnemonicParsing="false" text="Reset Data" />
+                     </items>
+                  </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                   <items>
                     <MenuItem fx:id="btnAbout" mnemonicParsing="false" text="About" />
@@ -49,7 +55,7 @@
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
             </TableView>
-          <TitledPane animated="false" contentDisplay="TOP" text="Add Product" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+          <TitledPane fx:id="addProductPane" animated="false" contentDisplay="TOP" text="Add Product" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>

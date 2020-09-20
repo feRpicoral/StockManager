@@ -14,8 +14,10 @@ public abstract class Util {
             "Computer"
     };
 
+    public static final String DATA_FILE_PATH = "data.json";
+
     //URL validation methods
-    public static boolean isURLValid(String url) {
+    private static boolean isURLValid(String url) {
         try {
             (new URL(url)).openStream().close();
             return true;

@@ -8,6 +8,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -15,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +38,12 @@ public class MainController extends ScrollPane {
 
     @FXML
     private MenuItem btnResetData;
+
+    @FXML
+    private MenuItem btnAddNew;
+
+    @FXML
+    private MenuItem btnRemoveByID;
 
     @FXML
     private MenuItem btnClose;
@@ -87,6 +95,9 @@ public class MainController extends ScrollPane {
 
     @FXML
     private TextField quantity;
+
+    @FXML
+    private TitledPane addProductPane;
 
     @FXML
     private TextField imgURL;
@@ -177,8 +188,9 @@ public class MainController extends ScrollPane {
         //MenuBar Buttons
         //Reset Data
         btnResetData.setOnAction(e -> {
-            //TODO Ask for confirmation
-            dataHandler.reset();
+            if (ConfirmBox.getConfirmation("Do you really want to delete all the products?")) {
+                dataHandler.reset();
+            }
         });
 
         //Close program
@@ -187,10 +199,24 @@ public class MainController extends ScrollPane {
             app.stop();
         });
 
+        //Add new product menu button
+        btnAddNew.setOnAction(e -> {
+            if (addProductPane.isCollapsible()) {
+                addProductPane.setExpanded(true);
+            }
+        });
+
+        //Remove by ID
+        btnRemoveByID.setOnAction(e -> {
+            new RemoveBox(dataHandler);
+        });
+
         //About program
         btnAbout.setOnAction(e -> {
 
         });
+
+        //End of MenuBar buttons
 
         //Load image preview
         imgURL.setOnKeyTyped(e -> {

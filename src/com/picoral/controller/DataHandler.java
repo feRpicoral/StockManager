@@ -10,11 +10,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,12 +23,20 @@ public class DataHandler {
 
     private JSONObject json = new JSONObject();
     private TableView<Product> table;
+    private String jsonStr;
     private final File f;
     private final ArrayList<Product> productsFromJSON = new ArrayList<>();
 
     public DataHandler() {
 
-        f = new File("data.json");
+        f = new File(Util.DATA_FILE_PATH);
+
+        //Current JSON data as string
+        try {
+            jsonStr = Files.lines(Paths.get(Util.DATA_FILE_PATH)).collect(Collectors.joining(System.lineSeparator()));
+        } catch (Exception ignored) {
+            System.out.println("The '" + Util.DATA_FILE_PATH + "' file was not found. It will be generated.");
+        }
 
         if (f.exists()) {
             load();
@@ -45,64 +51,48 @@ public class DataHandler {
      */
     private void load() {
 
+        //List which will hold all the json objects (products)
+        List<JSONObject> jList = new ArrayList<>();
+
         try {
 
-            //Current JSON as String
-            String jsonStr = Files.lines(Paths.get("data.json")).collect(Collectors.joining(System.lineSeparator()));
+            //If there's only one product it will be recognized as a JSONObject
+            //Otherwise it will be a JSONArray
 
-            try {
+            //Current JSON as JSONObject
+            jList.add(new JSONObject(jsonStr).getJSONObject("products"));
 
-                //If there's only one product it will be recognized as a JSONObject
-                //Otherwise it will be a JSONArray
+        } catch (Exception ignored) {
 
-                //Current JSON as JSONObject
-                JSONObject j = new JSONObject(jsonStr).getJSONObject("products");
+            //Current JSON as JSONArray
+            JSONArray arr = new JSONObject(jsonStr).getJSONArray("products");
 
-                String name = j.getString("name");
-                String ID = j.getString("id");
-                double price = j.getDouble("price");
-                String category = j.getString("category");
-                String model = j.getString("model");
-                String brand = j.getString("brand");
-                String warranty = j.getString("warranty");
-                int quantity = j.getInt("quantity");
-                String imageURL = j.getString("imageURL");
-
-                Product p = new Product(name, ID, price, category, model, brand, warranty, quantity, imageURL);
-
-                productsFromJSON.add(p);
-
-            } catch (Exception ignored) {
-
-                //Current JSON as JSONArray
-                JSONArray arr = new JSONObject(jsonStr).getJSONArray("products");
-
-                for (Object obj : arr) {
-                    if (obj instanceof JSONObject) {
-
-                        JSONObject j = (JSONObject) obj;
-
-                        String name = j.getString("name");
-                        String ID = j.getString("id");
-                        double price = j.getDouble("price");
-                        String category = j.getString("category");
-                        String model = j.getString("model");
-                        String brand = j.getString("brand");
-                        String warranty = j.getString("warranty");
-                        int quantity = j.getInt("quantity");
-                        String imageURL = j.getString("imageURL");
-
-                        Product p = new Product(name, ID, price, category, model, brand, warranty, quantity, imageURL);
-
-                        productsFromJSON.add(p);
-
-                    }
-                }
+            for (int i = 0; i < arr.length(); i++) {
+                jList.add(arr.getJSONObject(i));
             }
 
-        } catch (IOException e) {
+        }
 
-            e.printStackTrace();
+        //Loop for each object (product) from list
+        for (JSONObject j : jList) {
+
+            //Product properties
+            String name     = j.getString("name");
+            String ID       = j.getString("id");
+            double price    = j.getDouble("price");
+            String category = j.getString("category");
+            String model    = j.getString("model");
+            String brand    = j.getString("brand");
+            String warranty = j.getString("warranty");
+            int    quantity = j.getInt("quantity");
+            String imageURL = j.getString("imageURL");
+
+            Product p = new Product(name, ID, price, category, model, brand, warranty, quantity, imageURL);
+
+            //We can't add these to the table yet because it hasn't been created yet
+            //Since initialize() hasn't been called yet on MainController
+            //These products will be on hold and will be added once setTable is called
+            productsFromJSON.add(p);
 
         }
 
@@ -110,16 +100,17 @@ public class DataHandler {
 
 
     /**
-     * File was just created and need to be populated
+     * File was just created and needs to be populated
      */
     private void create() {
         try {
 
-            FileWriter fw = new FileWriter("data.json");
-            fw.write("{\"products\":[]}");
+            FileWriter fw = new FileWriter(Util.DATA_FILE_PATH);
+            fw.write("{\"products\":[]}"); //Empty JSON skeleton
             fw.close();
 
-            String jsonStr = Files.lines(Paths.get("data.json")).collect(Collectors.joining(System.lineSeparator()));
+            //Update current JSON as string an as object
+            jsonStr = Files.lines(Paths.get(Util.DATA_FILE_PATH)).collect(Collectors.joining(System.lineSeparator()));
             json = new JSONObject(jsonStr);
 
         } catch (Exception e) {
@@ -136,8 +127,14 @@ public class DataHandler {
 
         try {
 
+            String jsonStr = json.toString();
             FileWriter fw = new FileWriter(f);
-            fw.write(json.toString());
+
+            if (jsonStr.equals("{}")) {
+                jsonStr = "{\"products\":[]}";
+            }
+
+            fw.write(jsonStr);
             fw.close();
 
         } catch (Exception e) {
@@ -157,6 +154,8 @@ public class DataHandler {
 
     /**
      * Sets the table and add the products that were on the data.json file to it
+     *
+     * @param table the TableView to set as the class table
      */
     public void setTable(TableView<Product> table) {
         if (table != null) {
@@ -211,6 +210,7 @@ public class DataHandler {
      * @param product Product instance to be removed
      */
     public void removeProduct(Product product) {
+        removeFromJson(product);
         table.getItems().remove(product);
     }
 
@@ -222,12 +222,49 @@ public class DataHandler {
      */
     public void removeProduct(String id) {
 
+        //List of products to remove to avoid concurrent modification exception
+        List<Product> toRemove = new ArrayList<>();
+
         for (Product p : table.getItems()) {
 
             if (p.getID().equals(id)) {
 
-                removeProduct(p);
+                toRemove.add(p);
 
+            }
+
+        }
+
+        toRemove.forEach(this::removeProduct);
+
+    }
+
+    /**
+     * Removes the given product from the JSONObject, if present.
+     *
+     * @param product Product to be removed from the JSONObject
+     */
+    private void removeFromJson(Product product) {
+
+        if (json.get("products") instanceof JSONArray) {
+            //More than one product in the list - JSONArray
+
+            JSONArray arr = (JSONArray) json.get("products");
+
+            for (int i = 0; i < arr.length(); i++) {
+
+                if (((JSONObject) arr.get(i)).get("id").equals(product.getID())) {
+                    arr.remove(i);
+                }
+
+            }
+
+        } else {
+            //Only one product in the list - JSONObject
+
+            if (json.getJSONObject("products").get("id").equals(product.getID())) {
+                jsonStr = "{\"products\":[]}";
+                json = new JSONObject(jsonStr);
             }
 
         }
