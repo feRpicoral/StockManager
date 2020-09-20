@@ -6,7 +6,7 @@ import java.net.URL;
 public abstract class Util {
 
     //All possible product categories
-    //TODO Move this to an external file
+    //TODO Move this to an external file or menubar > config
     public static final String[] possibleCategories = new String[]{
             "Smart Phone",
             "Watch",
@@ -14,6 +14,9 @@ public abstract class Util {
             "Computer"
     };
 
+    //Path to the JSON where the data will be stored
+    //The file doesn't need to exist - if it doesn't it will be created
+    //Change to sample_data.json to quick test with a few products but don't remove them
     public static final String DATA_FILE_PATH = "data.json";
 
     //URL validation methods

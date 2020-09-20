@@ -28,8 +28,10 @@ public class App extends Application {
 
         this.window = window;
 
-        //Title
+        //Window properties
         window.setTitle("Stock Manager");
+        window.setMinWidth(800);
+        window.setMinHeight(500);
 
         //Main scene
         window.setScene(new Scene(

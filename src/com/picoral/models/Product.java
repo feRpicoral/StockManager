@@ -223,4 +223,8 @@ public class Product {
             this.imageURL = imageURL;
         }
     }
+
+    public boolean hasImage() {
+        return Util.isURLImage(imageURL);
+    }
 }

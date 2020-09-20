@@ -97,6 +97,7 @@ public class ConfirmBox {
 
         //Window properties
         window.initModality(Modality.APPLICATION_MODAL);
+        window.setResizable(false);
         window.setTitle("Remove Product by ID");
         window.setScene(new Scene(cb));
 

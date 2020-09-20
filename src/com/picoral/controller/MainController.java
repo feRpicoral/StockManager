@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -176,6 +177,55 @@ public class MainController extends ScrollPane {
         //Populate category combo box with possible categories
         category.getItems().addAll(Arrays.asList(Util.possibleCategories));
 
+        //ContextMenu for rows
+        ContextMenu cm = new ContextMenu(){{
+            getItems().add(new MenuItem("See more"));
+            getItems().add(new MenuItem("Remove"));
+        }};
+
+
+
+        //Handles right click on the table
+        table.setRowFactory(tableView -> {
+            TableRow<Product> row = new TableRow<>();
+
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.SECONDARY) {
+
+                    if (cm.isShowing()) {
+                        cm.hide();
+                    }
+
+                    cm.show(tableView, event.getScreenX(), event.getScreenY());
+
+                    //Menu handling
+                    //See more
+                    cm.getItems().get(0).setOnAction(e -> {
+                        new ViewProduct(row.getItem());
+                    });
+
+                    //Remove
+                    cm.getItems().get(1).setOnAction(e -> {
+                        if (ConfirmBox.getConfirmation("Do you really want delete this product?")) {
+                            dataHandler.removeProduct(row.getItem());
+                        }
+                    });
+
+                } else {
+                    //Clicked outside the menu
+                    cm.hide();
+
+                    //Clicked twice on row
+                    if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                        new ViewProduct(row.getItem());
+                    }
+                }
+            });
+            return row ;
+        });
+
+
+
         //Add product buttons
         //Add button on click
         btnAdd.setOnAction(this::addProduct);
@@ -329,6 +379,7 @@ public class MainController extends ScrollPane {
 
     /**
      * Load the image preview when the url is typed
+     * TODO Only load the image once in the whole program to increase performance
      */
     private void previewImage() {
         if (Util.isURLImage(imgURL.getText())) {
