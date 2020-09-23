@@ -125,7 +125,7 @@ public class ConfirmBox {
     }
 
     /**
-     * Calls a confirmation box with the given message and returns the answer
+     * Calls a confirmation box with the default message and returns the answer
      *
      * @return True if the user chooses 'Yes' and False otherwise
      */

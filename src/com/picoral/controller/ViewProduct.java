@@ -1,20 +1,20 @@
 package com.picoral.controller;
 
-import com.picoral.models.Product;
+import com.picoral.models.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Controller for the view more about product window
@@ -130,15 +130,223 @@ public class ViewProduct {
                 product.setWarranty(warrantyField.getText());
                 product.setQuantity(Integer.parseInt(quantityField.getText()));
 
+                switch (product.getCategory()) {
+
+                    case "Computer":
+
+                        Computer computer = (Computer) product;
+
+                        computer.setRam(uniqueFields.get(0).getText());
+                        computer.setGpu(uniqueFields.get(1).getText());
+                        computer.setCpu(uniqueFields.get(2).getText());
+                        computer.setStorageType(uniqueFields.get(3).getText());
+
+                        break;
+
+                    case "TV":
+
+                        TV tv = (TV) product;
+
+                        tv.setSize(uniqueFields.get(0).getText());
+                        tv.setResolution(uniqueFields.get(1).getText());
+
+                        break;
+
+                    case "Watch":
+
+                        Watch watch = (Watch) product;
+
+                        watch.setColor(uniqueFields.get(0).getText());
+                        watch.setSize(uniqueFields.get(1).getText());
+
+                        break;
+
+                    case "Phone":
+
+                        Phone phone = (Phone) product;
+
+                        phone.setOs(uniqueFields.get(0).getText());
+                        phone.setColor(uniqueFields.get(1).getText());
+
+                        break;
+
+                    default:
+                        throw new RuntimeException("InvalidCategoryException");
+
+                }
+
                 //Save the new values and update the table
                 dataHandler.updateProduct(product);
 
             });
 
+            addUniqueFields();
+
         }
 
         /**
-         * Change the text fields disabled stated based on the state parameter
+         * Adds the unique fields based on the product's category
+         */
+        private void addUniqueFields() {
+
+            switch (product.getCategory()) {
+
+                case "Computer":
+
+                    Computer c = (Computer) product;
+
+                    for (String property : Computer.getPropertiesArr()) {
+
+                        HBox hb = new HBox();
+                        hb.setAlignment(Pos.CENTER);
+                        hb.setSpacing(30);
+                        hb.setPrefWidth(200);
+                        hb.setPrefHeight(100);
+
+                        Label lb = new Label(property);
+
+                        Region region = new Region();
+                        HBox.setHgrow(region, Priority.ALWAYS);
+
+                        TextField tf = new TextField();
+                        tf.setText(c.getPropertyByName(property));
+                        tf.setAlignment(Pos.CENTER);
+                        tf.setDisable(true);
+
+                        hb.getChildren().addAll(lb, region, tf);
+
+                        VBox parent = (VBox) quantityField.getParent().getParent();
+
+                        uniqueFields.add(tf);
+
+                        parent.getChildren().add(
+                                parent.getChildren().size() - 1,
+                                hb
+                        );
+
+                    }
+
+                    break;
+
+                case "TV":
+
+                    TV tv = (TV) product;
+
+                    for (String property : TV.getPropertiesArr()) {
+
+                        HBox hb = new HBox();
+                        hb.setAlignment(Pos.CENTER);
+                        hb.setSpacing(30);
+                        hb.setPrefWidth(200);
+                        hb.setPrefHeight(100);
+
+                        Label lb = new Label(property);
+
+                        Region region = new Region();
+                        HBox.setHgrow(region, Priority.ALWAYS);
+
+                        TextField tf = new TextField();
+                        tf.setText(tv.getPropertyByName(property));
+                        tf.setAlignment(Pos.CENTER);
+                        tf.setDisable(true);
+
+                        hb.getChildren().addAll(lb, region, tf);
+
+                        VBox parent = (VBox) quantityField.getParent().getParent();
+
+                        uniqueFields.add(tf);
+
+                        parent.getChildren().add(
+                                parent.getChildren().size() - 1,
+                                hb
+                        );
+
+                    }
+
+                    break;
+
+                case "Watch":
+
+                    Watch w = (Watch) product;
+
+                    for (String property : Watch.getPropertiesArr()) {
+
+                        HBox hb = new HBox();
+                        hb.setAlignment(Pos.CENTER);
+                        hb.setSpacing(30);
+                        hb.setPrefWidth(200);
+                        hb.setPrefHeight(100);
+
+                        Label lb = new Label(property);
+
+                        Region region = new Region();
+                        HBox.setHgrow(region, Priority.ALWAYS);
+
+                        TextField tf = new TextField();
+                        tf.setText(w.getPropertyByName(property));
+                        tf.setAlignment(Pos.CENTER);
+                        tf.setDisable(true);
+
+                        hb.getChildren().addAll(lb, region, tf);
+
+                        VBox parent = (VBox) quantityField.getParent().getParent();
+
+                        uniqueFields.add(tf);
+
+                        parent.getChildren().add(
+                                parent.getChildren().size() - 1,
+                                hb
+                        );
+
+                    }
+
+                    break;
+
+                case "Phone":
+
+                    Phone p = (Phone) product;
+
+                    for (String property : Phone.getPropertiesArr()) {
+
+                        HBox hb = new HBox();
+                        hb.setAlignment(Pos.CENTER);
+                        hb.setSpacing(30);
+                        hb.setPrefWidth(200);
+                        hb.setPrefHeight(100);
+
+                        Label lb = new Label(property);
+
+                        Region region = new Region();
+                        HBox.setHgrow(region, Priority.ALWAYS);
+
+                        TextField tf = new TextField();
+                        tf.setText(p.getPropertyByName(property));
+                        tf.setAlignment(Pos.CENTER);
+                        tf.setDisable(true);
+
+                        hb.getChildren().addAll(lb, region, tf);
+
+                        VBox parent = (VBox) quantityField.getParent().getParent();
+
+                        uniqueFields.add(tf);
+
+                        parent.getChildren().add(
+                                parent.getChildren().size() - 1,
+                                hb
+                        );
+
+                    }
+
+                    break;
+
+                default:
+                    throw new RuntimeException("InvalidCategoryException");
+            }
+
+        }
+
+        /**
+         * Change the text fields disabled status based on the state parameter
          *
          * @param state New disabled state for all the text fields
          */
@@ -151,7 +359,11 @@ public class ViewProduct {
 
                         if (tf instanceof TextField) {
 
-                            if (!tf.getId().equals("idField")) {
+                            try {
+                                if (!tf.getId().equals("idField")) {
+                                    tf.setDisable(state);
+                                }
+                            } catch (Exception ignored) {
                                 tf.setDisable(state);
                             }
 
@@ -166,9 +378,10 @@ public class ViewProduct {
 
     }
 
-    Stage window;
-    DataHandler dataHandler;
-    Product product;
+    private final List<TextField> uniqueFields = new LinkedList<>();
+    private final Stage           window;
+    private final DataHandler     dataHandler;
+    private final Product         product;
 
     public ViewProduct(Product product, DataHandler dataHandler) {
 

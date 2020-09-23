@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Menu?>
@@ -52,9 +53,9 @@
             </TableView>
           <TitledPane fx:id="addProductPane" animated="false" contentDisplay="TOP" text="Add Product" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane>
                      <children>
-                        <HBox prefHeight="180.0" prefWidth="716.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <HBox alignment="CENTER_LEFT" prefHeight="180.0" prefWidth="796.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <VBox alignment="BASELINE_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                                  <children>
@@ -63,6 +64,9 @@
                                     <TextField fx:id="model" minWidth="200.0" promptText="Model" />
                                     <TextField fx:id="brand" minWidth="200.0" promptText="Brand" />
                                  </children>
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </HBox.margin>
                               </VBox>
                               <VBox alignment="BASELINE_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                                  <children>
@@ -71,17 +75,26 @@
                                     <TextField fx:id="imgURL" minWidth="200.0" promptText="Image URL (Optional)" />
                                     <ComboBox fx:id="category" minWidth="200.0" prefWidth="150.0" promptText="Category" />
                                  </children>
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </HBox.margin>
                               </VBox>
                               <VBox alignment="CENTER" spacing="20.0">
                                  <children>
                                     <Button fx:id="btnAdd" minWidth="60.0" mnemonicParsing="false" text="Add" />
                                     <Button fx:id="btnReset" minWidth="60.0" mnemonicParsing="false" text="Reset" />
                                  </children>
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </HBox.margin>
                               </VBox>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                                  <children>
                                     <ImageView fx:id="imgPreview" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </HBox.margin>
                               </VBox>
                            </children>
                         </HBox>

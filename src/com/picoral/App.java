@@ -1,32 +1,36 @@
 package com.picoral;
 
+import javafx.application.Application;
 import com.picoral.controller.DataHandler;
 import com.picoral.controller.MainController;
-import com.picoral.controller.Util;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class App extends Application {
 
     private Stage window;
-    DataHandler dataHandler = new DataHandler();
+    public  DataHandler   dataHandler = new DataHandler();
 
-    //Handling closing the program
+    /**
+     * Handles the request to close the program regardless from where it was called
+     */
     @Override
     public void stop() {
 
+        //Save current data
         dataHandler.save();
 
         //Close window
         window.close();
     }
 
+    /**
+     * Start the program - called by JavaFX
+     *
+     * @param window Main Stage
+     */
     @Override
-    public void start(Stage window) throws Exception{
+    public void start(Stage window){
 
         this.window = window;
 
@@ -54,7 +58,4 @@ public class App extends Application {
         launch(args);
     }
 
-    public Stage getWindow() {
-        return window;
-    }
 }

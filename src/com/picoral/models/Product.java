@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 
 import java.util.Arrays;
 
-public class Product {
+public abstract class Product {
 
     private String name;
     private String ID;

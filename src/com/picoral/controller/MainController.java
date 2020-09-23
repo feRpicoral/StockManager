@@ -1,7 +1,7 @@
 package com.picoral.controller;
 
 import com.picoral.App;
-import com.picoral.models.Product;
+import com.picoral.models.*;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -260,6 +260,9 @@ public class MainController extends ScrollPane {
         Util.Listeners.addPriceListener(price);
         Util.Listeners.addQuantityListener(quantity);
 
+        //Listener to add different fields once the category is changed
+        Util.Listeners.addCategoryListener(category, addProductPane);
+
     }
 
     private void addProduct(Event e) {
@@ -275,21 +278,96 @@ public class MainController extends ScrollPane {
             return;
         }
 
-        Product p = new Product(
-                name.getText(),
-                generateUniqueID(),
-                Double.parseDouble(price.getText()),
-                category.getValue(),
-                model.getText(),
-                brand.getText(),
-                warranty.getText(),
-                Integer.parseInt(quantity.getText()),
-                imgPreview.getImage(),
-                imgURL.getText()
-        );
+        Product p;
+
+        List<TextField> addedFields = Util.Listeners.getAddedFields();
+
+        switch (category.getValue()) {
+
+            case "Computer":
+
+                p = new Computer(
+                        name.getText(),
+                        generateUniqueID(),
+                        Double.parseDouble(price.getText()),
+                        category.getValue(),
+                        model.getText(),
+                        brand.getText(),
+                        warranty.getText(),
+                        Integer.parseInt(quantity.getText()),
+                        imgPreview.getImage(),
+                        imgURL.getText(),
+                        addedFields.get(0).getText(),
+                        addedFields.get(1).getText(),
+                        addedFields.get(2).getText(),
+                        addedFields.get(3).getText()
+                );
+
+                break;
+
+            case "TV":
+
+                p = new TV(
+                        name.getText(),
+                        generateUniqueID(),
+                        Double.parseDouble(price.getText()),
+                        category.getValue(),
+                        model.getText(),
+                        brand.getText(),
+                        warranty.getText(),
+                        Integer.parseInt(quantity.getText()),
+                        imgPreview.getImage(),
+                        imgURL.getText(),
+                        addedFields.get(0).getText(),
+                        addedFields.get(1).getText()
+                );
+
+                break;
+
+            case "Watch":
+
+                p = new Watch(
+                        name.getText(),
+                        generateUniqueID(),
+                        Double.parseDouble(price.getText()),
+                        category.getValue(),
+                        model.getText(),
+                        brand.getText(),
+                        warranty.getText(),
+                        Integer.parseInt(quantity.getText()),
+                        imgPreview.getImage(),
+                        imgURL.getText(),
+                        addedFields.get(0).getText(),
+                        addedFields.get(1).getText()
+                );
+
+                break;
+
+            case "Phone":
+
+                p = new Phone(
+                        name.getText(),
+                        generateUniqueID(),
+                        Double.parseDouble(price.getText()),
+                        category.getValue(),
+                        model.getText(),
+                        brand.getText(),
+                        warranty.getText(),
+                        Integer.parseInt(quantity.getText()),
+                        imgPreview.getImage(),
+                        imgURL.getText(),
+                        addedFields.get(0).getText(),
+                        addedFields.get(1).getText()
+                );
+
+                break;
+
+            default:
+                throw new RuntimeException("InvalidCategoryException");
+
+        }
 
         dataHandler.addProduct(p);
-
         clearFields();
 
     }
@@ -298,6 +376,8 @@ public class MainController extends ScrollPane {
      * Clear all fields and remove the preview image
      */
     private void clearFields() {
+
+        Util.Listeners.resetAddedFields();
 
         HBox parent = (HBox) name.getParent().getParent();
 
@@ -324,6 +404,8 @@ public class MainController extends ScrollPane {
         comboBoxParent.getChildren().remove(category);
         comboBoxParent.getChildren().add(cb);
         category = cb; //Updated variable
+
+        Util.Listeners.addCategoryListener(cb, addProductPane);
 
         imgPreview.setImage(null);
 

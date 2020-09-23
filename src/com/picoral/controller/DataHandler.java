@@ -1,6 +1,6 @@
 package com.picoral.controller;
 
-import com.picoral.models.Product;
+import com.picoral.models.*;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -86,11 +86,61 @@ public class DataHandler {
             int    quantity = j.getInt("quantity");
             String imageURL = j.getString("imageURL");
 
-            Product p = new Product(name, ID, price, category, model, brand, warranty, quantity, imageURL);
+            Product p;
+
+            JSONObject unique = j.getJSONObject("unique");
+
+
+            String size, color, resolution, os;
+
+            switch (category) {
+                case "Computer":
+
+                    String ram         = unique.getString("ram");
+                    String gpu         = unique.getString("gpu");
+                    String cpu         = unique.getString("cpu");
+                    String storageType = unique.getString("storageType");
+
+                    p = new Computer(name, ID, price, category, model, brand, warranty, quantity, imageURL, ram, gpu, cpu, storageType);
+
+                    break;
+
+                case "TV":
+
+                    size       = unique.getString("size");
+                    resolution = unique.getString("resolution");
+
+                    p = new TV(name, ID, price, category, model, brand, warranty, quantity, imageURL, size, resolution);
+
+                    break;
+
+                case "Watch":
+
+                    color = unique.getString("color");
+                    size  = unique.getString("size");
+
+                    p = new Watch(name, ID, price, category, model, brand, warranty, quantity, imageURL, color, size);
+
+                    break;
+
+                case "Phone":
+
+                    os    = unique.getString("os");
+                    color = unique.getString("color");
+
+                    p = new Phone(name, ID, price, category, model, brand, warranty, quantity, imageURL, os, color);
+
+                    break;
+
+                default:
+                    throw new RuntimeException("InvalidCategoryException");
+
+            }
 
             //We can't add these to the table yet because it hasn't been created yet
             //Since initialize() hasn't been called yet on MainController
             //These products will be on hold and will be added once setTable is called
+
             productsFromJSON.add(p);
 
         }
@@ -196,6 +246,53 @@ public class DataHandler {
             put("quantity", product.getQuantity());
             put("imageURL", finalImgURL);
         }};
+
+        JSONObject unique = new JSONObject();
+
+        switch (product.getCategory()) {
+            case "Computer":
+
+                Computer c = (Computer) product;
+
+                unique.put("ram", c.getRam());
+                unique.put("gpu", c.getGpu());
+                unique.put("cpu", c.getCpu());
+                unique.put("storageType", c.getStorageType());
+
+                break;
+
+            case "TV":
+
+                TV tv = (TV) product;
+
+                unique.put("size", tv.getSize());
+                unique.put("resolution", tv.getResolution());
+
+                break;
+
+            case "Watch":
+
+                Watch w = (Watch) product;
+
+                unique.put("color", w.getColor());
+                unique.put("size", w.getSize());
+
+                break;
+
+            case "Phone":
+
+                Phone p = (Phone) product;
+
+                unique.put("color", p.getColor());
+                unique.put("os", p.getOs());
+
+                break;
+
+            default:
+                throw new RuntimeException("InvalidCategoryException");
+        }
+
+        values.put("unique", unique);
 
         //Append to the current obj
         json.accumulate("products", values);
