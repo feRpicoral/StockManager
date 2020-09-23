@@ -1,16 +1,14 @@
 package com.picoral.controller;
 
-import com.picoral.App;
 import com.picoral.models.Product;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-import javafx.scene.image.Image;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -201,6 +199,41 @@ public class DataHandler {
 
         //Append to the current obj
         json.accumulate("products", values);
+
+    }
+
+    /**
+     * Update product info by removing the old object and adding a new one as the updated version
+     *
+     * @param product Product instance to be updated
+     */
+    public void updateProduct(Product product) {
+
+        Product old = null;
+
+        //Get old version of the product by ID since it's immutable
+        for (Product p : table.getItems()) {
+
+            if (p.getID().equals(product.getID())) {
+
+                old = p;
+
+            }
+
+        }
+
+        if (old != null) {
+            //Remove the old obj and a new one (the updated version)
+            removeProduct(old);
+            addProduct(product);
+
+            //Workaround to force table update
+            for (TableColumn<Product, ?> c : table.getColumns()) {
+                c.setVisible(false);
+                c.setVisible(true);
+            }
+
+        }
 
     }
 

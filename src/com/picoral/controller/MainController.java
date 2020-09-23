@@ -2,13 +2,10 @@ package com.picoral.controller;
 
 import com.picoral.App;
 import com.picoral.models.Product;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -17,9 +14,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -172,15 +166,14 @@ public class MainController extends ScrollPane {
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
         //Populate category combo box with possible categories
-        category.getItems().addAll(Arrays.asList(Util.possibleCategories));
+        String[] categoriesSorted = Util.sortStringArray(Util.possibleCategories);
+        category.getItems().addAll(Arrays.asList(categoriesSorted));
 
         //ContextMenu for rows
         ContextMenu cm = new ContextMenu(){{
             getItems().add(new MenuItem("See more"));
             getItems().add(new MenuItem("Remove"));
         }};
-
-
 
         //Handles right click on the table
         table.setRowFactory(tableView -> {
@@ -198,7 +191,7 @@ public class MainController extends ScrollPane {
                     //Menu handling
                     //See more
                     cm.getItems().get(0).setOnAction(e -> {
-                        new ViewProduct(row.getItem());
+                        new ViewProduct(row.getItem(), dataHandler);
                     });
 
                     //Remove
@@ -214,14 +207,12 @@ public class MainController extends ScrollPane {
 
                     //Clicked twice on row
                     if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                        new ViewProduct(row.getItem());
+                        new ViewProduct(row.getItem(), dataHandler);
                     }
                 }
             });
             return row ;
         });
-
-
 
         //Add product buttons
         //Add button on click
@@ -265,58 +256,9 @@ public class MainController extends ScrollPane {
             previewImage();
         });
 
-        //Only allow numbers and dots to the price
-        //Also, only allow two numbers after the dot
-        price.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-
-                if (newValue.contains(".")) {
-
-                    int counter = 0;
-                    for (char c : oldValue.toCharArray()) {
-                        if (c == '.') {
-                            counter++;
-                        }
-                    }
-
-                    if (counter == 0) {
-                        price.setText(newValue.replaceAll("[^\\d+\\.+[0-9]{1,2}]", ""));
-                    } else {
-
-                        int dotIndex = newValue.indexOf(".");
-                        String beforeDot = newValue.substring(0, dotIndex);
-                        String afterDot = newValue.substring(dotIndex + 1);
-                        afterDot = afterDot.replaceAll("\\D", "");
-
-                        if (afterDot.length() > 2) {
-                            afterDot = String.valueOf(afterDot.charAt(0)) + afterDot.charAt(1);
-                        }
-
-                        price.setText(beforeDot + "." + afterDot);
-
-                    }
-
-                } else {
-
-                    price.setText(newValue.replaceAll("\\D", ""));
-
-                }
-
-            }
-        });
-
-        //Assure quantity are numbers only
-        quantity.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    quantity.setText(newValue.replaceAll("[^\\d]", ""));
-                }
-            }
-        });
-
+        //Add listeners to the price and quantity fields, the only two which need data validation
+        Util.Listeners.addPriceListener(price);
+        Util.Listeners.addQuantityListener(quantity);
 
     }
 
@@ -370,7 +312,6 @@ public class MainController extends ScrollPane {
             }
 
         }
-
 
         //Best solution so far to reset the value and keep the promp text
         //Prob there is a better solution, but so far this works fine

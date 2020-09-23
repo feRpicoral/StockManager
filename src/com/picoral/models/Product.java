@@ -3,7 +3,6 @@ package com.picoral.models;
 import com.picoral.controller.Util;
 import javafx.scene.image.Image;
 
-import java.io.InputStream;
 import java.util.Arrays;
 
 public class Product {
@@ -15,9 +14,9 @@ public class Product {
     private String model;
     private String brand;
     private String warranty;
-    private int quantity;
+    private int    quantity;
     private String imageURL;
-    private Image image;
+    private Image  image;
 
     /**
      * Main constructor

@@ -1,49 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" type="AnchorPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="AnchorPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER" prefHeight="300.0" prefWidth="500.0" spacing="30.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <VBox alignment="CENTER_LEFT" spacing="10.0">
+            <VBox fx:id="parent" prefHeight="380.0" prefWidth="280.0" spacing="17.0">
                <children>
-                  <Label text="Name" />
-                  <Label text="ID" />
-                  <Label text="Price" />
-                  <Label text="Catagory" />
-                  <Label text="Model" />
-                  <Label text="Brand" />
-                  <Label text="Warranty" />
-                  <Label text="Quantity" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="Name" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="nameField" alignment="CENTER" disable="true" text="Placeholder" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="ID" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField id="idField" fx:id="idField" alignment="CENTER" disable="true" text="0000" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="Price" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="priceField" alignment="CENTER" disable="true" text="\$00.00" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="Catagory" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="categoryField" alignment="CENTER" disable="true" text="Placeholder" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="Model" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="modelField" alignment="CENTER" disable="true" text="Placeholder" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="Brand" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="brandField" alignment="CENTER" disable="true" text="Placeholder" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="Warranty" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="warrantyField" alignment="CENTER" disable="true" text="Placeholder" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Label text="Quantity" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="quantityField" alignment="CENTER" disable="true" text="0000" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                     <children>
+                        <Button fx:id="btnEdit" minWidth="60.0" mnemonicParsing="false" text="Edit" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnSave" minWidth="60.0" mnemonicParsing="false" text="Save" visible="false" />
+                     </children>
+                  </HBox>
                </children>
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
-            <VBox alignment="CENTER_RIGHT" spacing="10.0">
-               <children>
-                  <Label fx:id="name" text="Placeholder" />
-                  <Label fx:id="id" text="0000" />
-                  <Label fx:id="price" text="\$00.00" />
-                  <Label fx:id="category" text="Placeholder" />
-                  <Label fx:id="model" text="Placeholder" />
-                  <Label fx:id="brand" text="Placeholder" />
-                  <Label fx:id="warranty" text="Placeholder" />
-                  <Label fx:id="quantity" text="0000" />
-               </children>
-            </VBox>
-            <Region />
             <Group>
                <children>
                   <ImageView fx:id="imageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="noImgLabel" alignment="CENTER" layoutX="30.0" layoutY="67.0" text="This product has no image" textAlignment="CENTER" />
                </children>
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
             </Group>
          </children>
       </HBox>

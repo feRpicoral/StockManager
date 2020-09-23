@@ -3,11 +3,15 @@ package com.picoral.controller;
 import com.picoral.models.Product;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -22,35 +26,45 @@ public class ViewProduct {
      */
     private class ViewProductLayout extends AnchorPane {
 
-        @FXML
-        private Label name;
 
         @FXML
-        private Label id;
+        private TextField nameField;
 
         @FXML
-        private Label price;
+        private TextField idField;
 
         @FXML
-        private Label category;
+        private TextField priceField;
 
         @FXML
-        private Label model;
+        private TextField categoryField;
 
         @FXML
-        private Label brand;
+        private TextField modelField;
 
         @FXML
-        private Label warranty;
+        private TextField brandField;
 
         @FXML
-        private Label quantity;
+        private TextField warrantyField;
+
+        @FXML
+        private TextField quantityField;
+
+        @FXML
+        private Button btnEdit;
+
+        @FXML
+        private Button btnSave;
 
         @FXML
         private ImageView imageView;
 
         @FXML
         private Label noImgLabel;
+
+        @FXML
+        private VBox parent;
 
         public ViewProductLayout() {
 
@@ -69,29 +83,100 @@ public class ViewProduct {
         @FXML
         void initialize() {
 
-            name.setText(product.getName());
-            id.setText(product.getID());
-            price.setText(Double.toString(product.getPrice()));
-            category.setText(product.getCategory());
-            model.setText(product.getModel());
-            brand.setText(product.getBrand());
-            warranty.setText(product.getWarranty());
-            quantity.setText(Integer.toString(product.getQuantity()));
+            //TODO Allow the product's image url to be edited
 
+            //Add listeners to the price and quantity fields, the only two which need data validation
+            Util.Listeners.addPriceListener(priceField);
+            Util.Listeners.addQuantityListener(quantityField);
+
+            //Update fields values to the actual product info
+            nameField.setText(product.getName());
+            idField.setText(product.getID());
+            priceField.setText(Double.toString(product.getPrice()));
+            categoryField.setText(product.getCategory());
+            modelField.setText(product.getModel());
+            brandField.setText(product.getBrand());
+            warrantyField.setText(product.getWarranty());
+            quantityField.setText(Integer.toString(product.getQuantity()));
+
+            //Set product image
             if (product.hasImage()) {
                 noImgLabel.setVisible(false);
                 imageView.setImage(product.getImage());
             }
 
+            //Edit button on click
+            btnEdit.setOnAction(e -> {
 
+                //Make the fields editable (not disabled) and show the save button
+                btnSave.setVisible(true);
+                changeTextFieldDisabledState(false);
+
+            });
+
+            //Save button on click
+            btnSave.setOnAction(e -> {
+
+                //Hide the button and set the fields as disables (non editable)
+                btnSave.setVisible(false);
+                changeTextFieldDisabledState(true);
+
+                //Update the value
+                product.setName(nameField.getText());
+                product.setPrice(Double.parseDouble(priceField.getText()));
+                product.setCategory(categoryField.getText());
+                product.setModel(modelField.getText());
+                product.setBrand(brandField.getText());
+                product.setWarranty(warrantyField.getText());
+                product.setQuantity(Integer.parseInt(quantityField.getText()));
+
+                //Save the new values and update the table
+                dataHandler.updateProduct(product);
+
+            });
+
+        }
+
+        /**
+         * Change the text fields disabled stated based on the state parameter
+         *
+         * @param state New disabled state for all the text fields
+         */
+        private void changeTextFieldDisabledState(boolean state) {
+            for (Node hb : parent.getChildren()) {
+
+                if (hb instanceof HBox) {
+
+                    for (Node tf : ((HBox) hb).getChildren()) {
+
+                        if (tf instanceof TextField) {
+
+                            if (!tf.getId().equals("idField")) {
+                                tf.setDisable(state);
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
         }
 
     }
 
     Stage window;
+    DataHandler dataHandler;
     Product product;
 
-    public ViewProduct(Product product) {
+    public ViewProduct(Product product, DataHandler dataHandler) {
+
+        if (dataHandler == null) {
+            throw new RuntimeException("Data Handler reference is null");
+        }
+
+        this.dataHandler = dataHandler;
 
         if (product == null) {
             throw new RuntimeException("Product reference is null");
