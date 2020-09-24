@@ -58,6 +58,9 @@ public class ViewProduct {
         private Button btnSave;
 
         @FXML
+        private Button btnCancel;
+
+        @FXML
         private ImageView imageView;
 
         @FXML
@@ -66,6 +69,7 @@ public class ViewProduct {
         @FXML
         private VBox parent;
 
+        //Load the .fxml
         public ViewProductLayout() {
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/product.fxml"));
@@ -88,14 +92,7 @@ public class ViewProduct {
             Util.Listeners.addQuantityListener(quantityField);
 
             //Update fields values to the actual product info
-            nameField.setText(product.getName());
-            idField.setText(product.getID());
-            priceField.setText(Double.toString(product.getPrice()));
-            categoryField.setText(product.getCategory());
-            modelField.setText(product.getModel());
-            brandField.setText(product.getBrand());
-            warrantyField.setText(product.getWarranty());
-            quantityField.setText(Integer.toString(product.getQuantity()));
+            populateFields();
 
             //Set product image
             if (product.hasImage()) {
@@ -158,19 +155,44 @@ public class ViewProduct {
 
                 //Make the fields editable (not disabled) and show the save button
                 btnSave.setVisible(true);
-                changeTextFieldDisabledState(false);
+                btnCancel.setVisible(true);
+                changeTextFieldDisabledState();
+
+            });
+
+            //Cancel edit button on click
+            btnCancel.setOnAction(e -> {
+
+                //Hide buttons
+                btnCancel.setVisible(false);
+                btnSave.setVisible(false);
+
+                //Disable all the fields and populate the universal ones with the old values
+                changeTextFieldDisabledState();
+                populateFields();
+
+                //Invert the current edit mode state
+                changeEditMode();
+
+                //Revert the unique fields data to theirs original state
+                //TODO Not the best performance wise since to revert the fields it's deleting and re-adding them
+                for (TextField uniqueField : uniqueFields) {
+                    VBox parent = (VBox) uniqueField.getParent().getParent();
+                    parent.getChildren().remove(uniqueField.getParent());
+                }
+                addUniqueFields();
 
             });
 
             //Save button on click
             btnSave.setOnAction(e -> {
 
-                System.out.println("called");
                 changeEditMode();
 
                 //Hide the button and set the fields as disables (non editable)
                 btnSave.setVisible(false);
-                changeTextFieldDisabledState(true);
+                btnCancel.setVisible(false);
+                changeTextFieldDisabledState();
 
                 //Update the value
                 product.setName(nameField.getText());
@@ -244,9 +266,26 @@ public class ViewProduct {
 
             addUniqueFields();
 
+            //Auto enter on edit mode
             if (editMode) {
                 btnEdit.fire();
             }
+
+        }
+
+        /**
+         * Populate the text fields with the product's info
+         */
+        private void populateFields() {
+
+            nameField.setText(product.getName());
+            idField.setText(product.getID());
+            priceField.setText(Double.toString(product.getPrice()));
+            categoryField.setText(product.getCategory());
+            modelField.setText(product.getModel());
+            brandField.setText(product.getBrand());
+            warrantyField.setText(product.getWarranty());
+            quantityField.setText(Integer.toString(product.getQuantity()));
 
         }
 
@@ -412,11 +451,9 @@ public class ViewProduct {
         }
 
         /**
-         * Change the text fields disabled status based on the state parameter
-         *
-         * @param state New disabled state for all the text fields
+         * Inverts the text fields disabled state
          */
-        private void changeTextFieldDisabledState(boolean state) {
+        private void changeTextFieldDisabledState() {
             for (Node hb : parent.getChildren()) {
 
                 if (hb instanceof HBox) {
@@ -425,12 +462,14 @@ public class ViewProduct {
 
                         if (tf instanceof TextField) {
 
+                            boolean currentState = tf.isDisabled();
+
                             try {
                                 if (!tf.getId().equals("idField")) {
-                                    tf.setDisable(state);
+                                    tf.setDisable(!currentState);
                                 }
                             } catch (Exception ignored) {
-                                tf.setDisable(state);
+                                tf.setDisable(!currentState);
                             }
 
                         }
@@ -459,6 +498,10 @@ public class ViewProduct {
      * @param editMode If true, the window will open as if the edit button was clicked (on edit mode)
      */
     public ViewProduct(Product product, DataHandler dataHandler, boolean editMode) {
+
+        if (!product.hasImage()) {
+            product.loadImage();
+        }
 
         if (dataHandler == null) {
             throw new RuntimeException("Data Handler reference is null");

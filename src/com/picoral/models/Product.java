@@ -67,14 +67,6 @@ public abstract class Product {
         this.image = image;
         this.imageURL = imageURL;
 
-        if (!imageURL.isBlank() && image == null) {
-
-            try {
-                this.image = new Image(imageURL);
-            } catch (Exception ignored) {}
-
-        }
-
     }
 
     /**
@@ -142,6 +134,24 @@ public abstract class Product {
             quantity -= amount;
         }
 
+    }
+
+    /**
+     * Creates the image object from the current image url and returns true if operations was successful
+     *
+     * @return True if and only if the url was valid and was possible to load an image from id; false otherwise
+     */
+    public boolean loadImage() {
+        if (!imageURL.isBlank() && image == null) {
+
+            try {
+                this.image = new Image(imageURL);
+                return true;
+            } catch (Exception ignored) {}
+
+        }
+
+        return false;
     }
 
     //To String - debug only
