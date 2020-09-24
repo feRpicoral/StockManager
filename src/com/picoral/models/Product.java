@@ -2,7 +2,6 @@ package com.picoral.models;
 
 import com.picoral.controller.Util;
 import javafx.scene.image.Image;
-
 import java.util.Arrays;
 
 public abstract class Product {
@@ -161,7 +160,6 @@ public abstract class Product {
                 '}';
     }
 
-
     //Getters & Setters
 
     public String getName() {
@@ -249,12 +247,18 @@ public abstract class Product {
     /**
      * Set the image as the image in the given URL
      *
-     * @deprecated
      * @param imageURL URL of a image.
+     * @return True if and only if the url is valid and points to an image, otherwise returns false
      */
-    public void setImageURL(String imageURL) {
-        if (Util.isURLImage(imageURL)) {
+    public boolean setImageURL(String imageURL) {
+
+        try {
+            Image img = new Image(imageURL);
             this.imageURL = imageURL;
+            setImage(img);
+            return true;
+        } catch (Exception ignored) {
+            return false;
         }
     }
 

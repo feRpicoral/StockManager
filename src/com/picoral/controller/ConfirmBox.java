@@ -33,9 +33,9 @@ public class ConfirmBox {
 
         private final String msg;
 
-        public ConfirmBoxLayout(String msg) {
+        private ConfirmBoxLayout(String msg) {
 
-            this.msg = msg;
+            this.msg   = msg;
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/confirm.fxml"));
             loader.setRoot(this);
@@ -83,11 +83,15 @@ public class ConfirmBox {
     boolean answer;
     Stage window;
 
-    private ConfirmBox(String msg) {
+    private ConfirmBox(String msg, String title) {
 
         //Stage and layout initialization
         AnchorPane cb = new ConfirmBoxLayout(msg);
         window = new Stage();
+
+        if (!title.isBlank()) {
+            window.setTitle(title);
+        }
 
         //Avoid skipping stop handling if closed through the X
         window.setOnCloseRequest(e -> {
@@ -98,7 +102,6 @@ public class ConfirmBox {
         //Window properties
         window.initModality(Modality.APPLICATION_MODAL);
         window.setResizable(false);
-        window.setTitle("Remove Product by ID");
         window.setScene(new Scene(cb));
 
         //Show window
@@ -120,17 +123,17 @@ public class ConfirmBox {
      * @param msg Message to be displayed to the user
      * @return True if the user chooses 'Yes' and False otherwise
      */
-    public static boolean getConfirmation(String msg) {
-        return new ConfirmBox(msg).getAnswer();
+    public static boolean getConfirmation(String msg, String title) {
+        return new ConfirmBox(msg, title).getAnswer();
     }
 
     /**
-     * Calls a confirmation box with the default message and returns the answer
+     * Calls a confirmation box with the given message and the default title and returns the answer
      *
      * @return True if the user chooses 'Yes' and False otherwise
      */
-    public static boolean getConfirmation() {
-        return getConfirmation("");
+    public static boolean getConfirmation(String msg) {
+        return getConfirmation(msg, "Confirmation");
     }
 
 }

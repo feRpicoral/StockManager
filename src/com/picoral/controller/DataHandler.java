@@ -3,10 +3,8 @@ package com.picoral.controller;
 import com.picoral.models.*;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;

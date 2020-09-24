@@ -6,10 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -25,7 +26,6 @@ public class ViewProduct {
      * ViewProduct layout handler
      */
     private class ViewProductLayout extends AnchorPane {
-
 
         @FXML
         private TextField nameField;
@@ -83,8 +83,6 @@ public class ViewProduct {
         @FXML
         void initialize() {
 
-            //TODO Allow the product's image url to be edited
-
             //Add listeners to the price and quantity fields, the only two which need data validation
             Util.Listeners.addPriceListener(priceField);
             Util.Listeners.addQuantityListener(quantityField);
@@ -103,10 +101,60 @@ public class ViewProduct {
             if (product.hasImage()) {
                 noImgLabel.setVisible(false);
                 imageView.setImage(product.getImage());
+
+                ContextMenu cm = new ContextMenu(){{
+                    getItems().add(new MenuItem("Change Image"));
+                    getItems().add(new MenuItem("Copy URL"    ));
+                    getItems().add(new MenuItem("Copy Image"  ));
+
+                    //Edit Image
+                    getItems().get(0).setOnAction(e -> {
+
+                        new ChangeURLBox(dataHandler, product);
+                        imageView.setImage(product.getImage());
+
+                    });
+
+                    //Copy url
+                    getItems().get(1).setOnAction(e -> {
+
+                        Clipboard.getSystemClipboard().setContent(new ClipboardContent(){{
+                            putString(product.getImageURL());
+                            putHtml(String.format("<a>%s</a>", product.getImageURL()));
+                        }});
+
+                    });
+
+                    //Copy image
+                    getItems().get(2).setOnAction(e -> {
+
+                        Clipboard.getSystemClipboard().setContent(new ClipboardContent(){{
+                            putImage(product.getImage());
+                            putHtml(String.format("<img src=\"%s\">", product.getImageURL()));
+                        }});
+
+                    });
+
+                }};
+
+
+
+                imageView.setOnContextMenuRequested(event -> {
+
+                    if (cm.isShowing()) {
+                        cm.hide();
+                    }
+
+                    cm.show(imageView, event.getScreenX(), event.getScreenY());
+
+                });
+
             }
 
             //Edit button on click
             btnEdit.setOnAction(e -> {
+
+                changeEditMode();
 
                 //Make the fields editable (not disabled) and show the save button
                 btnSave.setVisible(true);
@@ -116,6 +164,9 @@ public class ViewProduct {
 
             //Save button on click
             btnSave.setOnAction(e -> {
+
+                System.out.println("called");
+                changeEditMode();
 
                 //Hide the button and set the fields as disables (non editable)
                 btnSave.setVisible(false);
@@ -180,7 +231,22 @@ public class ViewProduct {
 
             });
 
+            //Allow to close using esc
+            this.setOnKeyPressed(event -> {
+
+                if (event.getCode() == KeyCode.ESCAPE) {
+
+                    stop();
+
+                }
+
+            });
+
             addUniqueFields();
+
+            if (editMode) {
+                btnEdit.fire();
+            }
 
         }
 
@@ -382,8 +448,17 @@ public class ViewProduct {
     private final Stage           window;
     private final DataHandler     dataHandler;
     private final Product         product;
+    private       boolean         editMode;
 
-    public ViewProduct(Product product, DataHandler dataHandler) {
+    /**
+     * Constructor for the ViewProduct window. Once called will create a new window displaying the
+     * specified product and its properties
+     *
+     * @param product Product to be displayed
+     * @param dataHandler DataHandler reference to save possible changes
+     * @param editMode If true, the window will open as if the edit button was clicked (on edit mode)
+     */
+    public ViewProduct(Product product, DataHandler dataHandler, boolean editMode) {
 
         if (dataHandler == null) {
             throw new RuntimeException("Data Handler reference is null");
@@ -396,6 +471,8 @@ public class ViewProduct {
         }
 
         this.product = product;
+
+        this.editMode = editMode;
 
         //Stage and layout initialization
         AnchorPane vp = new ViewProductLayout();
@@ -417,8 +494,31 @@ public class ViewProduct {
 
     }
 
+    /**
+     * Constructor without explicit declaring the edit mode to false
+     *
+     * @param product Product to display
+     * @param dataHandler DataHandler reference to be able to save possible changes
+     */
+    public ViewProduct(Product product, DataHandler dataHandler) {
+        this(product, dataHandler, false);
+    }
+
     private void stop() {
-        window.close();
+
+        if (!this.editMode) {
+            window.close();
+        } else if (ConfirmBox.getConfirmation("Do you really want to leave? Any unsaved changes will be lost.")) {
+            window.close();
+        }
+
+    }
+
+    /**
+     * Inverts the edit mode once called
+     */
+    private void changeEditMode() {
+        this.editMode = !this.editMode;
     }
 
 }

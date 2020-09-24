@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -139,6 +140,9 @@ public class MainController extends ScrollPane {
     @FXML
     void initialize() {
 
+        //Make sure the titled pane starts collapsed
+        addProductPane.setExpanded(false);
+
         //Make the table accessible through the DataHandler
         dataHandler.setTable(table);
 
@@ -156,14 +160,14 @@ public class MainController extends ScrollPane {
         }};
 
         //Tie properties to table cols
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        IdCol.setCellValueFactory(new PropertyValueFactory<>("ID"));
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
-        modelCol.setCellValueFactory(new PropertyValueFactory<>("model"));
-        brandCol.setCellValueFactory(new PropertyValueFactory<>("brand"));
-        warrantyCol.setCellValueFactory(new PropertyValueFactory<>("warranty"));
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        nameCol.    setCellValueFactory(new PropertyValueFactory<>("name"     ));
+        IdCol.      setCellValueFactory(new PropertyValueFactory<>("ID"       ));
+        priceCol.   setCellValueFactory(new PropertyValueFactory<>("price"    ));
+        categoryCol.setCellValueFactory(new PropertyValueFactory<>("category" ));
+        modelCol.   setCellValueFactory(new PropertyValueFactory<>("model"    ));
+        brandCol.   setCellValueFactory(new PropertyValueFactory<>("brand"    ));
+        warrantyCol.setCellValueFactory(new PropertyValueFactory<>("warranty" ));
+        quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity" ));
 
         //Populate category combo box with possible categories
         String[] categoriesSorted = Util.sortStringArray(Util.possibleCategories);
@@ -171,11 +175,12 @@ public class MainController extends ScrollPane {
 
         //ContextMenu for rows
         ContextMenu cm = new ContextMenu(){{
-            getItems().add(new MenuItem("See more"));
-            getItems().add(new MenuItem("Remove"));
+            getItems().add(new MenuItem("Edit"     ));
+            getItems().add(new MenuItem("See more" ));
+            getItems().add(new MenuItem("Remove"   ));
         }};
 
-        //Handles right click on the table
+        //Handles right click on a row
         table.setRowFactory(tableView -> {
             TableRow<Product> row = new TableRow<>();
 
@@ -189,13 +194,20 @@ public class MainController extends ScrollPane {
                     cm.show(tableView, event.getScreenX(), event.getScreenY());
 
                     //Menu handling
-                    //See more
+                    //Edit
                     cm.getItems().get(0).setOnAction(e -> {
+
+                        new ViewProduct(row.getItem(), dataHandler, true);
+
+                    });
+
+                    //See more
+                    cm.getItems().get(1).setOnAction(e -> {
                         new ViewProduct(row.getItem(), dataHandler);
                     });
 
                     //Remove
-                    cm.getItems().get(1).setOnAction(e -> {
+                    cm.getItems().get(2).setOnAction(e -> {
                         if (ConfirmBox.getConfirmation("Do you really want delete this product?")) {
                             dataHandler.removeProduct(row.getItem());
                         }
@@ -211,7 +223,31 @@ public class MainController extends ScrollPane {
                     }
                 }
             });
+
             return row ;
+        });
+
+        //Handles key pressed on a selected row
+        table.setOnKeyPressed(event -> {
+
+            Product current = table.getSelectionModel().getSelectedItem();
+
+            switch (event.getCode()) {
+
+                case ENTER:
+
+                    new ViewProduct(current, dataHandler);
+                    break;
+
+                case DELETE: case BACK_SPACE:
+
+                    if (ConfirmBox.getConfirmation("Do you really want delete this product?")) {
+                        dataHandler.removeProduct(current);
+                    }
+                    break;
+
+            }
+
         });
 
         //Add product buttons

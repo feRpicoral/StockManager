@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     private Stage window;
-    public  DataHandler   dataHandler = new DataHandler();
+    public  DataHandler dataHandler = new DataHandler();
 
     /**
      * Handles the request to close the program regardless from where it was called
