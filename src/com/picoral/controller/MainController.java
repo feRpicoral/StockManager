@@ -133,8 +133,6 @@ public class MainController extends ScrollPane {
             e.printStackTrace();
         }
 
-
-
     }
 
     @FXML
@@ -457,7 +455,6 @@ public class MainController extends ScrollPane {
             imgPreview.setImage(img);
 
         } catch (Exception ignored) {}
-
 
     }
 

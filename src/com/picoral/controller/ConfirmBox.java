@@ -35,7 +35,7 @@ public class ConfirmBox {
 
         private ConfirmBoxLayout(String msg) {
 
-            this.msg   = msg;
+            this.msg = msg;
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/confirm.fxml"));
             loader.setRoot(this);

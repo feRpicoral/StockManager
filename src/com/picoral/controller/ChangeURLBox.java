@@ -76,7 +76,7 @@ public class ChangeURLBox {
     private final Product product;
     private final DataHandler dataHandler;
 
-    public ChangeURLBox(DataHandler dataHandler ,Product product) {
+    public ChangeURLBox(DataHandler dataHandler, Product product) {
 
         if (product == null) {
             throw new RuntimeException("Product reference is null");

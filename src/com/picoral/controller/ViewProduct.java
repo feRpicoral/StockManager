@@ -134,8 +134,6 @@ public class ViewProduct {
 
                 }};
 
-
-
                 imageView.setOnContextMenuRequested(event -> {
 
                     if (cm.isShowing()) {

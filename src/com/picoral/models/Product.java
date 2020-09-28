@@ -90,52 +90,6 @@ public abstract class Product {
         this(name, ID, price, category, model, brand, warranty, quantity, image, "");
     }
 
-
-
-    /**
-     * Increase current amount by 1
-     */
-    public void increaseQuantity() {
-        increaseQuantity(1);
-    }
-
-    /**
-     * Increase product quantity by given amount
-     *
-     * @param amount int amount greater than 0 to increase to the current quantity
-     */
-    public void increaseQuantity(int amount) {
-
-        if (amount > 0) {
-            quantity += amount;
-        }
-
-    }
-
-    /**
-     * Decrease current quantity by 1
-     */
-    public void decreaseQuantity() {
-        decreaseQuantity(1);
-    }
-
-    /**
-     * Decrease product quantity by given amount
-     *
-     * @param amount int amount greater than 0 to decrease from the current quantity
-     */
-    public void decreaseQuantity(int amount) {
-
-        if (amount < 1) {
-            return;
-        }
-
-        if (quantity - amount >= 0) {
-            quantity -= amount;
-        }
-
-    }
-
     /**
      * Creates the image object from the current image url and returns true if operations was successful
      *
@@ -265,7 +219,7 @@ public abstract class Product {
         try {
             Image img = new Image(imageURL);
             this.imageURL = imageURL;
-            setImage(img);
+            this.image = img;
             return true;
         } catch (Exception ignored) {
             return false;

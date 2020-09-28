@@ -34,7 +34,7 @@ public abstract class Util {
     * The file doesn't need to exist - if it doesn't it will be created
     * Change to sample_data.json to test with a few products already added
     */
-    public static final String DATA_FILE_PATH = "sample_data.json";
+    public static final String DATA_FILE_PATH = "data.json";
 
     /**
      * Verify if the given string is a valid URL.

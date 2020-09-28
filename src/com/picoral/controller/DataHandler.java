@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,7 +82,7 @@ public class DataHandler {
             String model    = j.getString("model");
             String brand    = j.getString("brand");
             String warranty = j.getString("warranty");
-            int    quantity = j.getInt("quantity");
+            int    quantity = j.getInt(   "quantity");
             String imageURL = j.getString("imageURL");
 
             Product p;
@@ -216,7 +217,7 @@ public class DataHandler {
     }
 
     /**
-     * Add product to the table
+     * Add product to the table and to the JSON object variable
      *
      * @param product Product instance to be added
      */
@@ -389,7 +390,7 @@ public class DataHandler {
             }
 
         } else {
-            //Only one product in the list - JSONObject
+            //Only one product in the list - JSONObject\
 
             if (json.getJSONObject("products").get("id").equals(product.getID())) {
                 jsonStr = "{\"products\":[]}";
