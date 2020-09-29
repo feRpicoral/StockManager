@@ -7,7 +7,9 @@ import java.net.URL;
  *
  * https://stackoverflow.com/questions/64111442/how-to-access-resources-folder-from-inner-package-in-gradle
  * > SO Question is now closed, link will lead to similar question
+ *
  */
+@Deprecated
 public class Resources {
 
     /**
@@ -15,7 +17,9 @@ public class Resources {
      *
      * @param name Relative path to the file
      * @return URL Object pointing to the file or null if the path (name param) is invalid
+     * @deprecated Use getClass().getResource("/com/picoral/full/path") instead
      */
+    @Deprecated
     public static URL getFileAsURL(String name) {
         return Resources.class.getResource(name);
     }

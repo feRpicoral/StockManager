@@ -176,6 +176,7 @@ public class ViewProduct {
 
                 //Revert the unique fields data to theirs original state
                 //TODO Not the best performance wise since to revert the fields it's deleting and re-adding them
+                //Using this to avoid having to make a switch statement for every category
                 for (TextField uniqueField : uniqueFields) {
                     VBox parent = (VBox) uniqueField.getParent().getParent();
                     parent.getChildren().remove(uniqueField.getParent());
@@ -195,13 +196,13 @@ public class ViewProduct {
                 changeTextFieldDisabledState();
 
                 //Update the value
-                product.setName(nameField.getText());
-                product.setPrice(Double.parseDouble(priceField.getText()));
-                product.setCategory(categoryField.getText());
-                product.setModel(modelField.getText());
-                product.setBrand(brandField.getText());
-                product.setWarranty(warrantyField.getText());
-                product.setQuantity(Integer.parseInt(quantityField.getText()));
+                product.setName    ( nameField.getText()                       );
+                product.setPrice   ( Double.parseDouble(priceField.getText())  );
+                product.setCategory( categoryField.getText()                   );
+                product.setModel   ( modelField.getText()                      );
+                product.setBrand   ( brandField.getText()                      );
+                product.setWarranty( warrantyField.getText()                   );
+                product.setQuantity( Integer.parseInt(quantityField.getText()) );
 
                 switch (product.getCategory()) {
 

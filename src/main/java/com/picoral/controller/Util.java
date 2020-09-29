@@ -34,9 +34,13 @@ public abstract class Util {
      * Name of the JSON that will be used to load and store data.
      * The file doesn't need to exist - if it doesn't it will be created.
      * It's located on {user.home}/.StockManager/data/{DATA_FILE_NAME}
-     * Change to sample_data.json to test with a few products already added
      */
-    public static final String DATA_FILE_NAME = "sample_data.json";
+    public static final String DATA_FILE_NAME = "data.json";
+
+    /**
+     * Path to the sample data JSON relative to the resources/com/picoral/ folder
+     */
+    public static final String SAMPLE_DATA_FILE_PATH = "sample_data.json";
 
     /**
      * Verify if the given string is a valid URL.
@@ -74,40 +78,13 @@ public abstract class Util {
     }
 
     /**
-     * Sorts string array alphabetically using selection sorting
-     * Not using Arrays.sort(x) due to university requirements
-     *
-     * @deprecated Use Arrays.sort(x) instead
-     * @param words String array to be sorted
-     * @return Sorted array
-     */
-    @Deprecated
-    public static String[] sortStringArray(String[] words) {
-
-        for (int i = 0; i < words.length; i++) {
-
-            for (int j = i + 1; j < words.length; j++) {
-
-                if (words[i].compareTo(words[j]) > 0) {
-
-                    String temp = words[i];
-                    words[i] = words[j];
-                    words[j] = temp;
-
-                }
-
-            }
-
-        }
-
-        return words;
-
-    }
-
-    /**
      * Handles data validation listeners
      */
     static class Listeners {
+
+        //TODO There's a quite serious problem in the program:
+        //if the number entered for price is bigger than Double.MAX_VALUE or the number
+        //entered for quantity is bigger than Integer.MAX_VALUE the program will crash
 
         /**
          * Adds to the given text field data validation to ensure only doubles with

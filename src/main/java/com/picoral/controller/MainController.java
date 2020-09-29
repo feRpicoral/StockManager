@@ -2,12 +2,12 @@ package com.picoral.controller;
 
 import com.picoral.App;
 import com.picoral.Resources;
+import com.picoral.models.*;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import com.picoral.models.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,7 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -109,6 +108,9 @@ public class MainController extends ScrollPane {
     @FXML
     private ImageView imgPreview;
 
+    @FXML
+    private CheckMenuItem btnUseSampleData;
+
     //Constructor with main app as parameter
     public MainController(App app, DataHandler dataHandler) {
 
@@ -170,8 +172,7 @@ public class MainController extends ScrollPane {
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity" ));
 
         //Populate category combo box with possible categories
-        String[] categoriesSorted = Util.sortStringArray(Util.possibleCategories);
-        category.getItems().addAll(Arrays.asList(categoriesSorted));
+        category.getItems().addAll(Arrays.asList(Util.possibleCategories));
 
         //ContextMenu for rows
         ContextMenu cm = new ContextMenu(){{
@@ -252,7 +253,10 @@ public class MainController extends ScrollPane {
 
         //Add product buttons
         //Add button on click
-        btnAdd.setOnAction(this::addProduct);
+        btnAdd.setOnAction(e -> {
+            addProduct(e);
+            addProductPane.setExpanded(false);
+        });
 
         //Reset fields button on click
         btnReset.setOnAction(e -> {
@@ -283,6 +287,23 @@ public class MainController extends ScrollPane {
         //Remove by ID
         btnRemoveByID.setOnAction(e -> {
             new RemoveBox(dataHandler);
+        });
+
+        //Use sample data check menu item
+        btnUseSampleData.setOnAction(e -> {
+
+            if (btnUseSampleData.isSelected()) {
+
+                dataHandler.loadSampleData();
+
+            } else {
+
+                dataHandler.unloadSampleData();
+
+            }
+
+            addProductPane.setExpanded(false);
+
         });
 
         //End of MenuBar buttons

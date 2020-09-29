@@ -5,7 +5,7 @@ Use it at your own risk.
 
 The data is stored as a JSON file, which will be created at `user.home/.StockManager/data/` if it doesn't already exist.
 
-To see the program in action without having to manually create any products, put the [sample_data.json](./sample_data.json) file into `user.home/.StockManager/data/`, change [Util.DATA_FILE_NAME](./src/main/java/com/picoral/controller/Util.java) to `sample_data.json` and run the program.
+To see the program in action without having to manually create any products, go to `Products > Use Sample Data`. Any changes you make to the sample data will be reverted once you restart the program or go back to your data. 
 
 This project uses Gradle 6.6.1, JLink 2.22.0, JavaFX 11.0.1 and the JavaSDK 1.11
 

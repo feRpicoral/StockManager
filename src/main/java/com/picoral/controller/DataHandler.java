@@ -5,9 +5,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +26,8 @@ public class DataHandler {
     private TableView<Product> table;
     private String jsonStr;
     private File f;
-    private final ArrayList<Product> productsFromJSON = new ArrayList<>();
+    private final List<Product> productsFromJSON = new ArrayList<>();
+    private boolean isUsingSampleData = false;
 
     public DataHandler() {
 
@@ -29,6 +35,104 @@ public class DataHandler {
         //If the file exists, parse it. Otherwise, create a new one
         //and parse the newly created file
         createFile();
+
+    }
+
+    /**
+     * Returns to the user generated data
+     */
+    public void unloadSampleData() {
+
+        //Make sure no product from different data file will be added
+        productsFromJSON.clear();
+
+        //Clear the table
+        resetJSONString();
+        isUsingSampleData = false;
+        table.getItems().clear();
+
+        //Load the user data file
+        createFile();
+
+        //Update the table
+        setTable(table);
+
+        System.out.println("[WARNING] You are no longer using sample data. All the changes here will be saved.");
+
+    }
+
+    /**
+     * Saves the current data and loads the sample data
+     */
+    public void loadSampleData() {
+
+        //Make sure no product from different data file will be added
+        productsFromJSON.clear();
+
+        //Save the changes to the user data file and clear the table
+        save();
+        table.getItems().clear();
+
+        //Reset the JSON string and object
+        resetJSONString();
+        isUsingSampleData = true;
+
+        try {
+
+            //Load the sample data file from the resources
+
+            try {
+
+                //When running on the IDE
+                f = new File(getClass().getResource("/com/picoral/" + Util.SAMPLE_DATA_FILE_PATH).toURI());
+
+            } catch (Exception ignored) {
+
+                //When running after compiled
+                FileSystem fs = FileSystems.getFileSystem(URI.create("jrt:/"));
+
+                //Get path opbject from modules
+                Path path = fs.getPath(
+
+                        "/modules/" + getClass().getModule().getName(),
+                        "com/picoral",
+                        Util.SAMPLE_DATA_FILE_PATH
+
+                );
+
+                //Set the sample data file to a temp file
+                //This temp file will contain the sample data, loaded from resources folder
+                f = File.createTempFile("temp", ".json");
+
+                FileWriter fw = new FileWriter(f);
+
+                fw.write(
+                        Files.readString(path)
+                );
+
+                fw.close();
+
+            }
+
+            //Make sure the sample data file exists
+            if (!f.exists()) {
+                throw new RuntimeException("Sample data file was not found in resources/com/picoral/" + Util.SAMPLE_DATA_FILE_PATH);
+            }
+
+            //Set the json string to the contents of the file
+            jsonStr = Files.lines(f.toPath()).collect(Collectors.joining(System.lineSeparator()));
+
+            //Parse the data
+            parse();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        //Update the table
+        setTable(table);
+
+        System.out.println("[WARNING] You are now using sample data. Any changes you make here won't be saved!");
 
     }
 
@@ -198,7 +302,7 @@ public class DataHandler {
             FileWriter fw = new FileWriter(f);
 
             if (jsonStr.equals("{}")) {
-                jsonStr = "{\"products\":[]}";
+                resetJSONString();
             }
 
             fw.write(jsonStr);
@@ -215,9 +319,17 @@ public class DataHandler {
      * Resets all the saved data. No confirmation prompt.
      */
     public void reset() {
+
+        table.getItems().clear();
+        resetJSONString();
+
+        if (isUsingSampleData) {
+            return;
+        }
+
+        //If using the user data, recreate the file and parse it again
         f.delete();
         createFile();
-        table.getItems().clear();
     }
 
     /**
@@ -226,6 +338,7 @@ public class DataHandler {
      * @param table the TableView to set as the class table
      */
     public void setTable(TableView<Product> table) {
+
         if (table != null) {
             this.table = table;
 
@@ -234,15 +347,27 @@ public class DataHandler {
             }
 
         }
+
     }
 
     /**
-     * Add product to the table and to the JSON object variable
+     * Add product to the table.
      *
      * @param product Product instance to be added
      */
     public void addProduct(Product product) {
+
+        addToJson(product);
         table.getItems().add(product);
+
+    }
+
+    /**
+     * Add product to JSONObject
+     *
+     * @param product Product instance to be added
+     */
+    private void addToJson(Product product) {
 
         //Avoids not adding the imageURL property if it is null
         String imgURL = product.getImageURL();
@@ -360,6 +485,11 @@ public class DataHandler {
      * @param product Product instance to be removed
      */
     public void removeProduct(Product product) {
+
+        if (product == null) {
+            return;
+        }
+
         removeFromJson(product);
         table.getItems().remove(product);
     }
@@ -372,22 +502,23 @@ public class DataHandler {
      */
     public void removeProduct(String id) {
 
-        //List of products to remove to avoid concurrent modification exception
-        List<Product> toRemove = new ArrayList<>();
+        //Product to remove to avoid concurrent modification exception
+        Product toRemove = null;
 
         for (Product p : table.getItems()) {
 
             if (p.getID().equals(id)) {
 
-                toRemove.add(p);
+                toRemove = p;
 
             }
 
         }
 
-        toRemove.forEach(this::removeProduct);
+        removeProduct(toRemove);
 
     }
+
 
     /**
      * Removes the given product from the JSONObject, if present.
@@ -413,11 +544,20 @@ public class DataHandler {
             //Only one product in the list - JSONObject\
 
             if (json.getJSONObject("products").get("id").equals(product.getID())) {
-                jsonStr = "{\"products\":[]}";
-                json = new JSONObject(jsonStr);
+                resetJSONString();
             }
 
         }
+
+    }
+
+    /**
+     * Resets the JSON String and the json variable
+     */
+    private void resetJSONString() {
+
+        jsonStr = "{\"products\":[]}";
+        json = new JSONObject(jsonStr);
 
     }
 }

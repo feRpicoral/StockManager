@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -31,6 +32,7 @@
                      <items>
                         <MenuItem fx:id="btnAddNew" mnemonicParsing="false" text="Add New" />
                         <MenuItem fx:id="btnRemoveByID" mnemonicParsing="false" text="Remove by ID" />
+                        <CheckMenuItem fx:id="btnUseSampleData" mnemonicParsing="false" text="Use Sample Data" />
                     <MenuItem fx:id="btnResetData" mnemonicParsing="false" text="Reset Data" />
                      </items>
                   </Menu>
