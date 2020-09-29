@@ -82,10 +82,6 @@ public abstract class Util {
      */
     static class Listeners {
 
-        //TODO There's a quite serious problem in the program:
-        //if the number entered for price is bigger than Double.MAX_VALUE or the number
-        //entered for quantity is bigger than Integer.MAX_VALUE the program will crash
-
         /**
          * Adds to the given text field data validation to ensure only doubles with
          * two or less digits after the dot can be inserted

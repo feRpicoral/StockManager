@@ -97,16 +97,20 @@ public abstract class Product {
      * @return True if and only if the url was valid and was possible to load an image from id; false otherwise
      */
     public boolean loadImage() {
+
         if (!imageURL.isBlank() && image == null) {
 
             try {
-                this.image = new Image(imageURL);
-                return true;
-            } catch (Exception ignored) {}
+
+                this.image = new Image(imageURL, true);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 
-        return false;
+        return image != null && image.isError();
     }
 
     //To String - debug only
@@ -228,7 +232,7 @@ public abstract class Product {
     }
 
     public boolean hasImage() {
-        return image != null;
+        return image != null && !image.isError();
     }
 
     public Image getImage() {

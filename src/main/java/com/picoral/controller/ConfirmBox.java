@@ -1,6 +1,5 @@
 package com.picoral.controller;
 
-import com.picoral.Resources;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -38,7 +37,7 @@ public class ConfirmBox {
 
             this.msg = msg;
 
-            FXMLLoader loader = new FXMLLoader(Resources.getFileAsURL("views/confirm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/picoral/views/confirm.fxml"));
             loader.setRoot(this);
             loader.setController(this);
 

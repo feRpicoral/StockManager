@@ -1,6 +1,5 @@
 package com.picoral.controller;
 
-import com.picoral.Resources;
 import com.picoral.models.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -74,7 +73,7 @@ public class ViewProduct {
         //Load the .fxml
         public ViewProductLayout() {
 
-            FXMLLoader loader = new FXMLLoader(Resources.getFileAsURL("views/product.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/picoral/views/product.fxml"));
             loader.setRoot(this);
             loader.setController(this);
 
@@ -175,7 +174,7 @@ public class ViewProduct {
                 changeEditMode();
 
                 //Revert the unique fields data to theirs original state
-                //TODO Not the best performance wise since to revert the fields it's deleting and re-adding them
+                //Not the best performance wise since to revert the fields it's deleting and re-adding them
                 //Using this to avoid having to make a switch statement for every category
                 for (TextField uniqueField : uniqueFields) {
                     VBox parent = (VBox) uniqueField.getParent().getParent();

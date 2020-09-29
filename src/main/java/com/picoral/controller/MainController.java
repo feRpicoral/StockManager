@@ -1,9 +1,7 @@
 package com.picoral.controller;
 
 import com.picoral.App;
-import com.picoral.Resources;
 import com.picoral.models.*;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -127,7 +125,7 @@ public class MainController extends ScrollPane {
         this.dataHandler = dataHandler;
 
         //Load fxml
-        FXMLLoader loader = new FXMLLoader(Resources.getFileAsURL("views/main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/picoral/views/main.fxml"));
         loader.setRoot(this);
         loader.setController(this);
 
@@ -254,8 +252,9 @@ public class MainController extends ScrollPane {
         //Add product buttons
         //Add button on click
         btnAdd.setOnAction(e -> {
-            addProduct(e);
-            addProductPane.setExpanded(false);
+            if (addProduct()) {
+                addProductPane.setExpanded(false);
+            }
         });
 
         //Reset fields button on click
@@ -322,20 +321,38 @@ public class MainController extends ScrollPane {
 
     }
 
-    private void addProduct(Event e) {
+    /**
+     * Create a product object based on the current information typed and adds it to the table
+     *
+     * @return True if the product was created, false otherwise
+     */
+    private boolean addProduct() {
 
         //Verify if all the mandatory fields are present
         for (TextField field : mandatoryFields) {
             if (field.getText().isBlank()) {
-                return;
+                return false;
             }
         }
 
         if (category.getValue() == null) {
-            return;
+            return false;
         }
 
         Product p;
+
+        //Make sure the price and quantity are within the double/integer possible range
+        //TODO Improve validation an give feedback to the user
+
+        try {
+
+            Integer.parseInt(quantity.getText());
+            Double.parseDouble(price.getText());
+
+        } catch (Exception ignored) {
+            return false;
+        }
+
 
         List<TextField> addedFields = Util.Listeners.getAddedFields();
 
@@ -426,6 +443,7 @@ public class MainController extends ScrollPane {
 
         dataHandler.addProduct(p);
         clearFields();
+        return true;
 
     }
 
