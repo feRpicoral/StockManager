@@ -1,10 +1,13 @@
 package com.picoral;
 
-import javafx.application.Application;
 import com.picoral.controller.DataHandler;
 import com.picoral.controller.MainController;
+import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
 
 public class App extends Application {
 
@@ -31,7 +34,7 @@ public class App extends Application {
      * @param window Main Stage
      */
     @Override
-    public void start(Stage window){
+    public void start(Stage window) throws IOException {
 
         this.window = window;
 

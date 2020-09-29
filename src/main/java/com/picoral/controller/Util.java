@@ -6,6 +6,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
+
 import javax.imageio.ImageIO;
 import java.net.URL;
 import java.util.LinkedList;
@@ -30,11 +31,12 @@ public abstract class Util {
     };
 
     /**
-    * Path to the JSON where the data will be stored
-    * The file doesn't need to exist - if it doesn't it will be created
-    * Change to sample_data.json to test with a few products already added
-    */
-    public static final String DATA_FILE_PATH = "data.json";
+     * Name of the JSON that will be used to load and store data.
+     * The file doesn't need to exist - if it doesn't it will be created.
+     * It's located on {user.home}/.StockManager/data/{DATA_FILE_NAME}
+     * Change to sample_data.json to test with a few products already added
+     */
+    public static final String DATA_FILE_NAME = "sample_data.json";
 
     /**
      * Verify if the given string is a valid URL.
@@ -62,6 +64,7 @@ public abstract class Util {
      * @param url URL as string to verify if it points to an image
      * @return True if and only if the given string is a valid URL and points to an image; false otherwise
      */
+    @Deprecated
     public static boolean isURLImage(String url) {
         try {
             return isURLValid(url) && ImageIO.read(new URL(url)) != null;
@@ -78,6 +81,7 @@ public abstract class Util {
      * @param words String array to be sorted
      * @return Sorted array
      */
+    @Deprecated
     public static String[] sortStringArray(String[] words) {
 
         for (int i = 0; i < words.length; i++) {

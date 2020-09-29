@@ -8,46 +8,85 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Writes and reads to the save files
+ * Writes and reads to the save file
  */
 public class DataHandler {
 
     private JSONObject json = new JSONObject();
     private TableView<Product> table;
     private String jsonStr;
-    private final File f;
+    private File f;
     private final ArrayList<Product> productsFromJSON = new ArrayList<>();
 
     public DataHandler() {
 
-        f = new File(Util.DATA_FILE_PATH);
+        //Start point to the DataHandler
+        //If the file exists, parse it. Otherwise, create a new one
+        //and parse the newly created file
+        createFile();
 
-        //Current JSON data as string
+    }
+
+    /**
+     * Create the JSON file if it doesn't exist.
+     * If it does exist, the file will be loaded and set to the class attribute "f"
+     */
+    private void createFile() {
+
+        //Location in the system of the directory for the data file
+        String dirPath = System.getProperty("user.home") +
+                File.separator +
+                ".StockManager" +
+                File.separator +
+                "data";
+
+        //Path to the actual file - dirPath followed by the file's name
+        String filePath = dirPath + File.separator + Util.DATA_FILE_NAME;
+
         try {
-            jsonStr = Files.lines(Paths.get(Util.DATA_FILE_PATH)).collect(Collectors.joining(System.lineSeparator()));
-        } catch (Exception ignored) {
-            System.out.println("The '" + Util.DATA_FILE_PATH + "' file was not found. It will be generated.");
-        }
 
-        if (f.exists()) {
-            load();
-        } else {
-            create();
+            File dir = new File(dirPath);
+
+            //Create the directories if needed
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            File file = new File(filePath);
+
+            //If the file doesn't exist, create a blank one
+            if (!file.exists()) {
+                file.createNewFile();
+
+                FileWriter fw = new FileWriter(file);
+                fw.write("{\"products\":[]}");
+                fw.close();
+
+            }
+
+            //Set the class file to the newly created - or loaded - file
+            // and set the jsonStr to the contents of this file
+            f = file;
+            jsonStr = Files.lines(f.toPath()).collect(Collectors.joining(System.lineSeparator()));
+
+            //Parse the contents of the file
+            parse();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
     }
 
     /**
-     * Load JSON file if it exists
+     * Parses the content of the JSON file
      */
-    private void load() {
+    private void parse() {
 
         //List which will hold all the json objects (products)
         List<JSONObject> jList = new ArrayList<>();
@@ -146,27 +185,6 @@ public class DataHandler {
 
     }
 
-
-    /**
-     * File was just created and needs to be populated
-     */
-    private void create() {
-        try {
-
-            FileWriter fw = new FileWriter(Util.DATA_FILE_PATH);
-            fw.write("{\"products\":[]}"); //Empty JSON skeleton
-            fw.close();
-
-            //Update current JSON as string an as object
-            jsonStr = Files.lines(Paths.get(Util.DATA_FILE_PATH)).collect(Collectors.joining(System.lineSeparator()));
-            json = new JSONObject(jsonStr);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
     /**
      * Called when program is about to close.
      * Saves the JSONObject to the file
@@ -175,7 +193,8 @@ public class DataHandler {
 
         try {
 
-            String jsonStr = json.toString();
+            jsonStr = json.toString();
+
             FileWriter fw = new FileWriter(f);
 
             if (jsonStr.equals("{}")) {
@@ -186,7 +205,8 @@ public class DataHandler {
             fw.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("[ERROR] It wasn't possible to save the data!");
+            throw new RuntimeException(e);
         }
 
     }
@@ -196,7 +216,7 @@ public class DataHandler {
      */
     public void reset() {
         f.delete();
-        create();
+        createFile();
         table.getItems().clear();
     }
 

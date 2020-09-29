@@ -1,5 +1,6 @@
 package com.picoral.controller;
 
+import com.picoral.Resources;
 import com.picoral.models.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +14,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,7 +74,7 @@ public class ViewProduct {
         //Load the .fxml
         public ViewProductLayout() {
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/product.fxml"));
+            FXMLLoader loader = new FXMLLoader(Resources.getFileAsURL("views/product.fxml"));
             loader.setRoot(this);
             loader.setController(this);
 

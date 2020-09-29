@@ -1,5 +1,6 @@
 package com.picoral.controller;
 
+import com.picoral.Resources;
 import com.picoral.models.Product;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +34,7 @@ public class ChangeURLBox {
 
         public ChangeURLBoxLayout() {
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/change-url.fxml"));
+            FXMLLoader loader = new FXMLLoader(Resources.getFileAsURL("views/change-url.fxml"));
             loader.setRoot(this);
             loader.setController(this);
 

@@ -2,6 +2,7 @@ package com.picoral.models;
 
 import com.picoral.controller.Util;
 import javafx.scene.image.Image;
+
 import java.util.Arrays;
 
 public abstract class Product {

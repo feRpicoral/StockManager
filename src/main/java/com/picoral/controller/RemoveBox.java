@@ -1,5 +1,6 @@
 package com.picoral.controller;
 
+import com.picoral.Resources;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -32,7 +33,7 @@ public class RemoveBox {
 
         public RemoveBoxLayout() {
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/remove.fxml"));
+            FXMLLoader loader = new FXMLLoader(Resources.getFileAsURL("views/remove.fxml"));
             loader.setRoot(this);
             loader.setController(this);
 

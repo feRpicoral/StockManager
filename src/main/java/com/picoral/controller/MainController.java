@@ -1,21 +1,23 @@
 package com.picoral.controller;
 
 import com.picoral.App;
-import com.picoral.models.*;
+import com.picoral.Resources;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import com.picoral.models.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,7 +125,7 @@ public class MainController extends ScrollPane {
         this.dataHandler = dataHandler;
 
         //Load fxml
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/main.fxml"));
+        FXMLLoader loader = new FXMLLoader(Resources.getFileAsURL("views/main.fxml"));
         loader.setRoot(this);
         loader.setController(this);
 
