@@ -1,18 +1,26 @@
-package com.picoral.controller;
+package com.picoral.gui.windows;
 
+import com.picoral.Util;
+import com.picoral.data.DataHandler;
+import com.picoral.gui.popups.ChangeURL;
+import com.picoral.gui.popups.ConfirmBox;
 import com.picoral.models.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -70,6 +78,12 @@ public class ViewProduct {
         @FXML
         private VBox parent;
 
+        @FXML
+        private ProgressBar imgProgressbar;
+
+        //Allow to revert to the old image if the user changes it to a invalid one
+        private Image oldImage;
+
         //Load the .fxml
         public ViewProductLayout() {
 
@@ -94,58 +108,10 @@ public class ViewProduct {
 
             //Update fields values to the actual product info
             populateFields();
+            addUniqueFields();
 
             //Set product image
-            if (product.hasImage()) {
-                noImgLabel.setVisible(false);
-                imageView.setImage(product.getImage());
-
-                ContextMenu cm = new ContextMenu(){{
-                    getItems().add(new MenuItem("Change Image"));
-                    getItems().add(new MenuItem("Copy URL"    ));
-                    getItems().add(new MenuItem("Copy Image"  ));
-
-                    //Edit Image
-                    getItems().get(0).setOnAction(e -> {
-
-                        new ChangeURLBox(dataHandler, product);
-                        imageView.setImage(product.getImage());
-
-                    });
-
-                    //Copy url
-                    getItems().get(1).setOnAction(e -> {
-
-                        Clipboard.getSystemClipboard().setContent(new ClipboardContent(){{
-                            putString(product.getImageURL());
-                            putHtml(String.format("<a>%s</a>", product.getImageURL()));
-                        }});
-
-                    });
-
-                    //Copy image
-                    getItems().get(2).setOnAction(e -> {
-
-                        Clipboard.getSystemClipboard().setContent(new ClipboardContent(){{
-                            putImage(product.getImage());
-                            putHtml(String.format("<img src=\"%s\">", product.getImageURL()));
-                        }});
-
-                    });
-
-                }};
-
-                imageView.setOnContextMenuRequested(event -> {
-
-                    if (cm.isShowing()) {
-                        cm.hide();
-                    }
-
-                    cm.show(imageView, event.getScreenX(), event.getScreenY());
-
-                });
-
-            }
+            setImage();
 
             //Edit button on click
             btnEdit.setOnAction(e -> {
@@ -161,10 +127,6 @@ public class ViewProduct {
 
             //Cancel edit button on click
             btnCancel.setOnAction(e -> {
-
-                //Hide buttons
-                btnCancel.setVisible(false);
-                btnSave.setVisible(false);
 
                 //Disable all the fields and populate the universal ones with the old values
                 changeTextFieldDisabledState();
@@ -188,20 +150,16 @@ public class ViewProduct {
             btnSave.setOnAction(e -> {
 
                 changeEditMode();
-
-                //Hide the button and set the fields as disables (non editable)
-                btnSave.setVisible(false);
-                btnCancel.setVisible(false);
                 changeTextFieldDisabledState();
 
                 //Update the value
-                product.setName    ( nameField.getText()                       );
-                product.setPrice   ( Double.parseDouble(priceField.getText())  );
-                product.setCategory( categoryField.getText()                   );
-                product.setModel   ( modelField.getText()                      );
-                product.setBrand   ( brandField.getText()                      );
-                product.setWarranty( warrantyField.getText()                   );
-                product.setQuantity( Integer.parseInt(quantityField.getText()) );
+                product.setName(nameField.getText());
+                product.setPrice(Double.parseDouble(priceField.getText()));
+                product.setCategory(categoryField.getText());
+                product.setModel(modelField.getText());
+                product.setBrand(brandField.getText());
+                product.setWarranty(warrantyField.getText());
+                product.setQuantity(Integer.parseInt(quantityField.getText()));
 
                 switch (product.getCategory()) {
 
@@ -254,7 +212,7 @@ public class ViewProduct {
             });
 
             //Allow to close using esc
-            this.setOnKeyPressed(event -> {
+            this.setOnKeyReleased(event -> {
 
                 if (event.getCode() == KeyCode.ESCAPE) {
 
@@ -264,8 +222,6 @@ public class ViewProduct {
 
             });
 
-            addUniqueFields();
-
             //Auto enter on edit mode
             if (editMode) {
                 btnEdit.fire();
@@ -274,7 +230,142 @@ public class ViewProduct {
         }
 
         /**
-         * Populate the text fields with the product's info
+         * Shows the product's image and handles the progress bar/label
+         */
+        private void setImage() {
+            setImage(false);
+        }
+
+        /**
+         * Shows the product's image and handles the progress bar/label
+         *
+         * @param isUpdate If the image is being loaded for the first time or it is being updated
+         */
+        private void setImage(boolean isUpdate) {
+
+            if (product.hasImage()) {
+
+                imageView.setImage(product.getImage());
+
+                //Right mouse btn menu
+                ContextMenu cm = new ContextMenu() {{
+                    getItems().add(new MenuItem("Change Image"));
+                    getItems().add(new MenuItem("Copy URL"));
+                    getItems().add(new MenuItem("Copy Image"));
+
+                    //Edit Image
+                    getItems().get(0).setOnAction(e -> {
+
+                        oldImage = product.getImage();
+                        new ChangeURL(dataHandler, viewWindow, product);
+                        imageView.setImage(product.getImage());
+
+                    });
+
+                    //Copy url
+                    getItems().get(1).setOnAction(e -> {
+
+                        Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{
+                            putString(product.getImageURL());
+                            putHtml(String.format("<a>%s</a>", product.getImageURL()));
+                        }});
+
+                    });
+
+                    //Copy image
+                    getItems().get(2).setOnAction(e -> {
+
+                        Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{
+                            putImage(product.getImage());
+                            putHtml(String.format("<img src=\"%s\">", product.getImageURL()));
+                        }});
+
+                    });
+
+                }};
+
+                if (product.isImageLoaded() && !isUpdate) {
+
+                    //Avoid showing the label and progress bar if the image has already been loaded
+                    noImgLabel.setVisible(false);
+                    imgProgressbar.setVisible(false);
+
+                } else {
+
+                    //Make sure it starts at 0 since it may be an update
+                    imgProgressbar.setProgress(0D);
+
+                    //Image is still loading
+                    imgProgressbar.setVisible(true);
+                    noImgLabel.setText("The image is loading...");
+                    noImgLabel.setVisible(true);
+
+                }
+
+                //Image loading progress listener
+                product.getImage().progressProperty().addListener((observable, oldValue, progress) -> {
+
+                    //Update the progress bar
+                    imgProgressbar.setProgress(progress.doubleValue());
+
+                    //Image finished loading
+                    if (progress.doubleValue() == 1D) {
+
+                        //Hide bar and label
+                        imgProgressbar.setVisible(false);
+                        noImgLabel.setVisible(false);
+
+                        //Image is invalid - due to background loading can only be called after it was fully loaded
+                        if (product.getImage().isError()) {
+
+                            //Show error
+                            noImgLabel.setText("The URL you entered is invalid\nThe old image will be used");
+                            noImgLabel.setVisible(true);
+
+                            //JavaFX TimeLine to reset the image after a delay
+                            Timeline timeline = new Timeline(new KeyFrame(Duration.ONE, event -> {
+
+                                //Reset the image view and product image attribute
+                                imageView.setImage(oldImage);
+                                product.setImage(oldImage);
+
+                                //Hide the error label and save the changes to the JSON
+                                noImgLabel.setVisible(false);
+                                dataHandler.updateProduct(product);
+
+                            }));
+
+                            timeline.setCycleCount(1);
+                            timeline.setDelay(Duration.seconds(2D)); //Delay of 2 seconds
+                            timeline.play();
+
+                        }
+
+                    }
+
+                });
+
+                //Right mouse btn on image handling
+                imageView.setOnContextMenuRequested(event -> {
+
+                    if (!product.isImageLoaded()) {
+                        event.consume();
+                        return;
+                    }
+
+                    if (cm.isShowing()) {
+                        cm.hide();
+                    }
+
+                    cm.show(imageView, event.getScreenX(), event.getScreenY());
+
+                });
+
+            }
+        }
+
+        /**
+         * Populate the non-unique text fields with the product's info
          */
         private void populateFields() {
 
@@ -481,21 +572,36 @@ public class ViewProduct {
             }
         }
 
+        /**
+         * Inverts the edit mode and sets the buttons' visibility state accordingly
+         */
+        private void changeEditMode() {
+            editMode = !editMode;
+
+            btnEdit.setVisible(!editMode);
+            btnSave.setVisible(editMode);
+            btnCancel.setVisible(editMode);
+        }
+
     }
 
     private final List<TextField> uniqueFields = new LinkedList<>();
-    private final Stage           window;
-    private final DataHandler     dataHandler;
-    private final Product         product;
-    private       boolean         editMode;
+    private final Stage window;
+    private final DataHandler dataHandler;
+    private final Product product;
+    private boolean editMode;
+
+    //Needed in order to re-show the progress bar & label if the user changes the image
+    private final ViewProduct viewWindow = this;
+    private final ViewProductLayout layout;
 
     /**
      * Constructor for the ViewProduct window. Once called will create a new window displaying the
      * specified product and its properties
      *
-     * @param product Product to be displayed
+     * @param product     Product to be displayed
      * @param dataHandler DataHandler reference to save possible changes
-     * @param editMode If true, the window will open as if the edit button was clicked (on edit mode)
+     * @param editMode    If true, the window will open as if the edit button was clicked (on edit mode)
      */
     public ViewProduct(Product product, DataHandler dataHandler, boolean editMode) {
 
@@ -509,16 +615,14 @@ public class ViewProduct {
 
         this.dataHandler = dataHandler;
 
-        if (product == null) {
-            throw new RuntimeException("Product reference is null");
-        }
-
         this.product = product;
 
         this.editMode = editMode;
 
+
         //Stage and layout initialization
-        AnchorPane vp = new ViewProductLayout();
+        ViewProductLayout vp = new ViewProductLayout();
+        layout = vp;
         window = new Stage();
 
         //Avoid skipping stop handling if closed through the X
@@ -540,7 +644,7 @@ public class ViewProduct {
     /**
      * Constructor without explicit declaring the edit mode to false
      *
-     * @param product Product to display
+     * @param product     Product to display
      * @param dataHandler DataHandler reference to be able to save possible changes
      */
     public ViewProduct(Product product, DataHandler dataHandler) {
@@ -558,10 +662,11 @@ public class ViewProduct {
     }
 
     /**
-     * Inverts the edit mode once called
+     * Public function to force image update. Through this it's possible to re-use the code
+     * to show the progress bar/label if the image is changed by the user
      */
-    private void changeEditMode() {
-        this.editMode = !this.editMode;
+    public void updateImage() {
+        layout.setImage(true);
     }
 
 }

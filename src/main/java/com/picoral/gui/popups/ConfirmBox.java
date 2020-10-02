@@ -1,4 +1,4 @@
-package com.picoral.controller;
+package com.picoral.gui.popups;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;

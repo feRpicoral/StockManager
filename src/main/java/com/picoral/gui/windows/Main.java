@@ -1,7 +1,12 @@
-package com.picoral.controller;
+package com.picoral.gui.windows;
 
-import com.picoral.App;
+import com.picoral.Util;
+import com.picoral.core.App;
+import com.picoral.data.DataHandler;
+import com.picoral.gui.popups.ConfirmBox;
+import com.picoral.gui.popups.RemoveBox;
 import com.picoral.models.*;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -20,7 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MainController extends ScrollPane {
+import static com.picoral.Constants.CATEGORIES;
+
+public class Main extends ScrollPane {
 
     private final App app;
     private List<TextField> mandatoryFields;
@@ -109,8 +116,14 @@ public class MainController extends ScrollPane {
     @FXML
     private CheckMenuItem btnUseSampleData;
 
+    @FXML
+    private Label noImgLabel;
+
+    @FXML
+    private ProgressBar imgProgressbar;
+
     //Constructor with main app as parameter
-    public MainController(App app, DataHandler dataHandler) {
+    public Main(App app, DataHandler dataHandler) {
 
         if (app == null) {
             throw new RuntimeException("App reference is null");
@@ -150,7 +163,7 @@ public class MainController extends ScrollPane {
         table.setPlaceholder(new Text("You don't have any products yet :("));
 
         //Populate mandatoryFields list
-        mandatoryFields = new ArrayList<>(){{
+        mandatoryFields = new ArrayList<>() {{
             add(name);
             add(price);
             add(model);
@@ -170,7 +183,7 @@ public class MainController extends ScrollPane {
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity" ));
 
         //Populate category combo box with possible categories
-        category.getItems().addAll(Arrays.asList(Util.possibleCategories));
+        category.getItems().addAll(Arrays.asList(CATEGORIES));
 
         //ContextMenu for rows
         ContextMenu cm = new ContextMenu(){{
@@ -223,7 +236,7 @@ public class MainController extends ScrollPane {
                 }
             });
 
-            return row ;
+            return row;
         });
 
         //Handles key pressed on a selected row
@@ -238,7 +251,8 @@ public class MainController extends ScrollPane {
                     new ViewProduct(current, dataHandler);
                     break;
 
-                case DELETE: case BACK_SPACE:
+                case DELETE:
+                case BACK_SPACE:
 
                     if (ConfirmBox.getConfirmation("Do you really want delete this product?")) {
                         dataHandler.removeProduct(current);
@@ -308,9 +322,7 @@ public class MainController extends ScrollPane {
         //End of MenuBar buttons
 
         //Load image preview
-        imgURL.setOnKeyTyped(e -> {
-            previewImage();
-        });
+        imgURL.textProperty().addListener(observable -> previewImage(((StringProperty) observable).get()));
 
         //Add listeners to the price and quantity fields, the only two which need data validation
         Util.Listeners.addPriceListener(price);
@@ -482,20 +494,135 @@ public class MainController extends ScrollPane {
 
         Util.Listeners.addCategoryListener(cb, addProductPane);
 
-        imgPreview.setImage(null);
+        //Reset the image preview
+        previewImage(null);
 
     }
 
     /**
-     * Load the image preview when the url is typed
+     * Loads the image from the given URL and sets it to the preview's ImageView
+     *
+     * @param url URL as String of the image
      */
-    private void previewImage() {
+    private void previewImage(String url) {
+
+        //Private class for handling the visibility and text of the labels and progress bar of the image preview
+        final class PreviewLabels {
+
+            /**
+             * Resets the label & progress bar to the no image state and nulls the image of the
+             * ImagePreview
+             */
+            private void reset() {
+
+                imgPreview.setImage(null);
+                imgProgressbar.setProgress(0D);
+                noImage();
+
+            }
+
+            /**
+             * Sets the label and progress bar to the loading state
+             */
+            private void loading() {
+
+                noImgLabel.setText("The image is loading...");
+                noImgLabel.setVisible(true);
+                imgProgressbar.setVisible(true);
+
+            }
+
+            /**
+             * Hides the label and progress bar and sets the image preview to the given image
+             *
+             * @param img JavaFX image to set in the image preview
+             */
+            private void loaded(Image img) {
+
+                imgPreview.setImage(img);
+                noImgLabel.setVisible(false);
+                imgProgressbar.setVisible(false);
+
+            }
+
+            /**
+             * Sets the label and progress bar to the initial no image state
+             */
+            private void noImage() {
+
+                noImgLabel.setText("This product has no image");
+                noImgLabel.setVisible(true);
+                imgProgressbar.setVisible(false);
+
+            }
+
+            /**
+             * Sets the label and progress bar to the invalid URL state
+             */
+            private void invalid() {
+
+                noImgLabel.setText("The URL you entered is invalid");
+                noImgLabel.setVisible(true);
+                imgProgressbar.setVisible(false);
+
+            }
+
+        }
+
+        PreviewLabels handler = new PreviewLabels();
+
+        handler.reset();
+
+        //If the user deleted the URL just reset the labels and return
+        if (url == null || url.isBlank()) {
+            return;
+        }
 
         try {
-            Image img = new Image(imgURL.getText());
-            imgPreview.setImage(img);
 
-        } catch (Exception ignored) {}
+            //Create JavaFX Image from the URL using background loading
+            //Note that due to background loading being set to true, isError() will only work after
+            //the image was fully loaded, otherwise isError() will return false to things like 'http:'
+            Image img = new Image(url, true);
+
+            //Update the labels to the loading state
+            handler.loading();
+
+            img.progressProperty().addListener((observable, oldValue, progress) -> {
+
+                if (oldValue.doubleValue() == 0D) {
+                    System.out.println("called");
+                }
+
+                //Update the progress bar
+                imgProgressbar.setProgress(progress.doubleValue());
+
+                //Image finished background loading
+                if (progress.doubleValue() == 1D) {
+
+                    //Since we are using background loading isError() is only reliable after the image was fully loaded
+                    if (img.isError()) {
+
+                        //The URL does not point to an image
+                        handler.invalid();
+
+                    } else {
+
+                        //The URL is valid and we got an image
+                        handler.loaded(img);
+
+                    }
+
+                }
+
+            });
+
+        } catch (Exception ignored) {
+
+            //The URL is invalid
+            handler.invalid();
+
+        }
 
     }
 
@@ -506,10 +633,10 @@ public class MainController extends ScrollPane {
      */
     private String generateUniqueID() {
 
-        int id = ThreadLocalRandom.current().nextInt(0,10_000);
+        int id = ThreadLocalRandom.current().nextInt(0, 10_000);
 
         while (!isIdUnique(id)) {
-            id = ThreadLocalRandom.current().nextInt(0,10_000);
+            id = ThreadLocalRandom.current().nextInt(0, 10_000);
         }
 
         return Integer.toString(id);

@@ -1,4 +1,4 @@
-package com.picoral.controller;
+package com.picoral.data;
 
 import com.picoral.models.*;
 import javafx.scene.control.TableColumn;
@@ -16,6 +16,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.picoral.Constants.DATA_FILE_NAME;
+import static com.picoral.Constants.SAMPLE_DATA_FILE_PATH;
 
 /**
  * Writes and reads to the save file
@@ -84,7 +87,7 @@ public class DataHandler {
             try {
 
                 //When running on the IDE
-                f = new File(getClass().getResource("/com/picoral/" + Util.SAMPLE_DATA_FILE_PATH).toURI());
+                f = new File(getClass().getResource("/com/picoral/" + SAMPLE_DATA_FILE_PATH).toURI());
 
             } catch (Exception ignored) {
 
@@ -96,7 +99,7 @@ public class DataHandler {
 
                         "/modules/" + getClass().getModule().getName(),
                         "com/picoral",
-                        Util.SAMPLE_DATA_FILE_PATH
+                        SAMPLE_DATA_FILE_PATH
 
                 );
 
@@ -116,7 +119,7 @@ public class DataHandler {
 
             //Make sure the sample data file exists
             if (!f.exists()) {
-                throw new RuntimeException("Sample data file was not found in resources/com/picoral/" + Util.SAMPLE_DATA_FILE_PATH);
+                throw new RuntimeException("Sample data file was not found in resources/com/picoral/" + SAMPLE_DATA_FILE_PATH);
             }
 
             //Set the json string to the contents of the file
@@ -150,7 +153,7 @@ public class DataHandler {
                 "data";
 
         //Path to the actual file - dirPath followed by the file's name
-        String filePath = dirPath + File.separator + Util.DATA_FILE_NAME;
+        String filePath = dirPath + File.separator + DATA_FILE_NAME;
 
         try {
 
@@ -218,14 +221,14 @@ public class DataHandler {
         for (JSONObject j : jList) {
 
             //Product properties
-            String name     = j.getString("name");
-            String ID       = j.getString("id");
-            double price    = j.getDouble("price");
+            String name = j.getString("name");
+            String ID = j.getString("id");
+            double price = j.getDouble("price");
             String category = j.getString("category");
-            String model    = j.getString("model");
-            String brand    = j.getString("brand");
+            String model = j.getString("model");
+            String brand = j.getString("brand");
             String warranty = j.getString("warranty");
-            int    quantity = j.getInt(   "quantity");
+            int quantity = j.getInt("quantity");
             String imageURL = j.getString("imageURL");
 
             Product p;
@@ -238,9 +241,9 @@ public class DataHandler {
             switch (category) {
                 case "Computer":
 
-                    String ram         = unique.getString("ram");
-                    String gpu         = unique.getString("gpu");
-                    String cpu         = unique.getString("cpu");
+                    String ram = unique.getString("ram");
+                    String gpu = unique.getString("gpu");
+                    String cpu = unique.getString("cpu");
                     String storageType = unique.getString("storageType");
 
                     p = new Computer(name, ID, price, category, model, brand, warranty, quantity, imageURL, ram, gpu, cpu, storageType);
@@ -249,7 +252,7 @@ public class DataHandler {
 
                 case "TV":
 
-                    size       = unique.getString("size");
+                    size = unique.getString("size");
                     resolution = unique.getString("resolution");
 
                     p = new TV(name, ID, price, category, model, brand, warranty, quantity, imageURL, size, resolution);
@@ -259,7 +262,7 @@ public class DataHandler {
                 case "Watch":
 
                     color = unique.getString("color");
-                    size  = unique.getString("size");
+                    size = unique.getString("size");
 
                     p = new Watch(name, ID, price, category, model, brand, warranty, quantity, imageURL, color, size);
 
@@ -267,7 +270,7 @@ public class DataHandler {
 
                 case "Phone":
 
-                    os    = unique.getString("os");
+                    os = unique.getString("os");
                     color = unique.getString("color");
 
                     p = new Phone(name, ID, price, category, model, brand, warranty, quantity, imageURL, os, color);
@@ -379,7 +382,7 @@ public class DataHandler {
         String finalImgURL = imgURL;
 
         //Create JSON obj
-        JSONObject values = new JSONObject(){{
+        JSONObject values = new JSONObject() {{
             put("name", product.getName());
             put("id", product.getID());
             put("price", product.getPrice());

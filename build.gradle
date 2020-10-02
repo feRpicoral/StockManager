@@ -1,4 +1,7 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
+    id "java"
     id "application"
     id "org.openjfx.javafxplugin" version "0.0.8"
     id "org.beryx.jlink" version "2.22.0"
@@ -20,7 +23,7 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-sourceCompatibility = 1.11
+sourceCompatibility = JavaVersion.VERSION_11
 
 jlink {
     launcher {
@@ -30,11 +33,35 @@ jlink {
 
 application {
     mainModule = "com.picoral.main"
-    mainClass = "com.picoral.App"
+    mainClass = "com.picoral.core.App"
+}
+
+
+//What should run after the jlink task
+project.tasks.getByName("jlink").doLast {
+
+    //If the OS is windows and image dir is present, copy the Start.vbs script into the folder
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+
+        if ( new File("$buildDir/image").isDirectory() ) {
+
+            copy {
+                from "$buildDir/resources/main/com/picoral/scripts/Start.vbs"
+                into "$buildDir/image/"
+            }
+
+        }
+
+    }
+
 }
 
 dependencies {
     //Gradle 7.0+ ready
     implementation group: 'org.json', name: 'json', version: '20200518'
 }
+
+
+
+
 

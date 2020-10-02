@@ -1,9 +1,10 @@
 package com.picoral.models;
 
-import com.picoral.controller.Util;
 import javafx.scene.image.Image;
 
 import java.util.Arrays;
+
+import static com.picoral.Constants.CATEGORIES;
 
 public abstract class Product {
 
@@ -39,7 +40,7 @@ public abstract class Product {
         }
 
         //Category
-        if (Arrays.asList(Util.possibleCategories).contains(category)) {
+        if (Arrays.asList(CATEGORIES).contains(category)) {
             this.category = category;
         }
 
@@ -113,6 +114,15 @@ public abstract class Product {
         return image != null && image.isError();
     }
 
+    /**
+     * Return if the image has finished loading
+     *
+     * @return True if and only if the image has finished loading
+     */
+    public boolean isImageLoaded() {
+        return image.progressProperty().get() == 1D;
+    }
+
     //To String - debug only
     @Override
     public String toString() {
@@ -160,7 +170,7 @@ public abstract class Product {
     }
 
     public void setCategory(String category) {
-        if (Arrays.asList(Util.possibleCategories).contains(category.toLowerCase())) {
+        if (Arrays.asList(CATEGORIES).contains(category.toLowerCase())) {
             this.category = category;
         }
     }
@@ -222,7 +232,7 @@ public abstract class Product {
     public boolean setImageURL(String imageURL) {
 
         try {
-            Image img = new Image(imageURL);
+            Image img = new Image(imageURL, true);
             this.imageURL = imageURL;
             this.image = img;
             return true;
@@ -241,5 +251,6 @@ public abstract class Product {
 
     public void setImage(Image image) {
         this.image = image;
+        this.imageURL = image.getUrl();
     }
 }

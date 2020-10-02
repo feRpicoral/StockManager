@@ -4,7 +4,9 @@ module com.picoral.main {
     requires java.desktop;
     requires org.json;
     requires jdk.crypto.ec;
-    opens com.picoral.controller;
+    opens com.picoral.core;
+    opens com.picoral.gui.popups;
+    opens com.picoral.gui.windows;
     opens com.picoral.models;
     exports com.picoral;
 }

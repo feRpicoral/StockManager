@@ -1,18 +1,17 @@
-package com.picoral;
+package com.picoral.core;
 
-import com.picoral.controller.DataHandler;
-import com.picoral.controller.MainController;
+import com.picoral.data.DataHandler;
+import com.picoral.gui.windows.Main;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 
 public class App extends Application {
 
     private Stage window;
-    public  DataHandler dataHandler = new DataHandler();
+    public DataHandler dataHandler = new DataHandler();
 
     /**
      * Handles the request to close the program regardless from where it was called
@@ -45,7 +44,7 @@ public class App extends Application {
 
         //Main scene
         window.setScene(new Scene(
-                new MainController(this, dataHandler)
+                new Main(this, dataHandler)
         ));
 
         //Avoids skipping handling in stop() if closed through the X

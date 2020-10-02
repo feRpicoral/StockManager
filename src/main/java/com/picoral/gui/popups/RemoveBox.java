@@ -1,6 +1,6 @@
-package com.picoral.controller;
+package com.picoral.gui.popups;
 
-import com.picoral.models.Product;
+import com.picoral.data.DataHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,25 +15,25 @@ import java.io.IOException;
 /**
  * Controller for the pop-up product removal box.
  */
-public class ChangeURLBox {
+public class RemoveBox {
 
     /**
      * RemoveBox fxml loader
      */
-    private class ChangeURLBoxLayout extends AnchorPane {
+    private class RemoveBoxLayout extends AnchorPane {
 
         @FXML
-        private TextField urlField;
+        private TextField idField;
 
         @FXML
-        private Button btnSave;
+        private Button btnRemove;
 
         @FXML
         private Button btnCancel;
 
-        public ChangeURLBoxLayout() {
+        public RemoveBoxLayout() {
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/picoral/views/change-url.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/picoral/views/remove.fxml"));
             loader.setRoot(this);
             loader.setController(this);
 
@@ -54,16 +54,17 @@ public class ChangeURLBox {
             });
 
             //Remove product button
-            btnSave.setOnAction(e -> {
+            btnRemove.setOnAction(e -> {
 
-                String url = urlField.getText();
+                String id = idField.getText();
+                String msg = String.format("Do you really want to delete the product with the ID %s?", id);
 
-                if (product.setImageURL(url)) {
-                    dataHandler.updateProduct(product);
+                //Call confirmation box
+                if (ConfirmBox.getConfirmation(msg)) {
+                    dataHandler.removeProduct(id);
                     stop();
                 } else {
-                    urlField.clear();
-                    urlField.setPromptText("The url you entered is invalid!");
+                    idField.clear();
                 }
 
             });
@@ -73,16 +74,9 @@ public class ChangeURLBox {
     }
 
     private final Stage window;
-    private final Product product;
     private final DataHandler dataHandler;
 
-    public ChangeURLBox(DataHandler dataHandler, Product product) {
-
-        if (product == null) {
-            throw new RuntimeException("Product reference is null");
-        }
-
-        this.product = product;
+    public RemoveBox(DataHandler dataHandler) {
 
         if (dataHandler == null) {
             throw new RuntimeException("DataHandler reference is null");
@@ -91,7 +85,7 @@ public class ChangeURLBox {
         this.dataHandler = dataHandler;
 
         //Stage and layout initialization
-        AnchorPane box = new ChangeURLBoxLayout();
+        AnchorPane rb = new RemoveBoxLayout();
         window = new Stage();
 
         //Avoid skipping stop handling if closed through the X
@@ -103,8 +97,8 @@ public class ChangeURLBox {
         //Window properties
         window.initModality(Modality.APPLICATION_MODAL);
         window.setResizable(false);
-        window.setTitle("Change Image URL");
-        window.setScene(new Scene(box));
+        window.setTitle("Remove Product by ID");
+        window.setScene(new Scene(rb));
 
         //Show window
         window.showAndWait();

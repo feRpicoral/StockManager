@@ -1,4 +1,4 @@
-package com.picoral.controller;
+package com.picoral;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -7,8 +7,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 
-import javax.imageio.ImageIO;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,69 +16,9 @@ import java.util.List;
 public abstract class Util {
 
     /**
-     * All possible products categories to validate the JSON once it's loaded
-     * Although adding a new category here would result in a new option appearing in the
-     * category selection drop box, it wouldn't work since implementation in multiple
-     * different classes is needed as well in order to it to work as expected
-     */
-    public static final String[] possibleCategories = new String[]{
-            "Phone",
-            "Watch",
-            "TV",
-            "Computer"
-    };
-
-    /**
-     * Name of the JSON that will be used to load and store data.
-     * The file doesn't need to exist - if it doesn't it will be created.
-     * It's located on {user.home}/.StockManager/data/{DATA_FILE_NAME}
-     */
-    public static final String DATA_FILE_NAME = "data.json";
-
-    /**
-     * Path to the sample data JSON relative to the resources/com/picoral/ folder
-     */
-    public static final String SAMPLE_DATA_FILE_PATH = "sample_data.json";
-
-    /**
-     * Verify if the given string is a valid URL.
-     * Can't return false positives since it tries to open the url.
-     * Usage should be as minimal as possible due to performance
-     *
-     * @param url String
-     * @return True if and only if the given string is a valid url
-     */
-    public static boolean isURLValid(String url) {
-        try {
-            (new URL(url)).openStream().close();
-            return true;
-        } catch (Exception ignored) { }
-
-        return false;
-    }
-
-    /**
-     * Verify if the given string is an image url
-     * Should not be used due to huge performance drawback.
-     * If used, reduce usage to as low as possible to improve performance
-     *
-     * @deprecated Consider other possibilities due to performance drawback
-     * @param url URL as string to verify if it points to an image
-     * @return True if and only if the given string is a valid URL and points to an image; false otherwise
-     */
-    @Deprecated
-    public static boolean isURLImage(String url) {
-        try {
-            return isURLValid(url) && ImageIO.read(new URL(url)) != null;
-        } catch (Exception ignored) {
-            return false;
-        }
-    }
-
-    /**
      * Handles data validation listeners
      */
-    static class Listeners {
+    public static class Listeners {
 
         /**
          * Adds to the given text field data validation to ensure only doubles with
@@ -172,7 +110,8 @@ public abstract class Util {
                 try {
                     VBox parent = (VBox) field.getParent();
                     parent.getChildren().remove(field);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             });
             addedFields = new LinkedList<>();
         }
@@ -190,7 +129,7 @@ public abstract class Util {
                 public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
 
                     VBox rightVB = (VBox) categoryBox.getParent();
-                    VBox leftVB  = (VBox) rightVB.getParent().getChildrenUnmodifiable().get(0);
+                    VBox leftVB = (VBox) rightVB.getParent().getChildrenUnmodifiable().get(0);
 
                     resetAddedFields();
 
@@ -220,7 +159,7 @@ public abstract class Util {
                             leftVB.getChildren().addAll(cpuField, ramField);
                             rightVB.getChildren().addAll(gpuField, storageTypeField);
 
-                            addedFields = new LinkedList<>(){{
+                            addedFields = new LinkedList<>() {{
                                 add(ramField);
                                 add(gpuField);
                                 add(cpuField);
@@ -242,7 +181,7 @@ public abstract class Util {
                             leftVB.getChildren().add(sizeField);
                             rightVB.getChildren().add(resField);
 
-                            addedFields = new LinkedList<>(){{
+                            addedFields = new LinkedList<>() {{
                                 add(sizeField);
                                 add(resField);
                             }};
@@ -263,7 +202,7 @@ public abstract class Util {
                             leftVB.getChildren().add(colorField);
                             rightVB.getChildren().add(sizeField);
 
-                            addedFields = new LinkedList<>(){{
+                            addedFields = new LinkedList<>() {{
                                 add(colorField);
                                 add(sizeField);
                             }};
@@ -284,7 +223,7 @@ public abstract class Util {
                             leftVB.getChildren().add(osField);
                             rightVB.getChildren().add(colorField);
 
-                            addedFields = new LinkedList<>(){{
+                            addedFields = new LinkedList<>() {{
                                 add(osField);
                                 add(colorField);
                             }};
