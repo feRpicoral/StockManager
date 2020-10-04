@@ -1,4 +1,4 @@
-module com.picoral.main {
+module StockManager.main {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.desktop;

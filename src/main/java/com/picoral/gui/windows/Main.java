@@ -29,10 +29,6 @@ import static com.picoral.Constants.CATEGORIES;
 
 public class Main extends ScrollPane {
 
-    private final App app;
-    private List<TextField> mandatoryFields;
-    private final DataHandler dataHandler;
-
     //FXML variables
 
     @FXML
@@ -122,20 +118,18 @@ public class Main extends ScrollPane {
     @FXML
     private ProgressBar imgProgressbar;
 
+    private final App app;
+    private List<TextField> mandatoryFields;
+    private final DataHandler dataHandler = App.dataHandler;
+
     //Constructor with main app as parameter
-    public Main(App app, DataHandler dataHandler) {
+    public Main(App app) {
 
         if (app == null) {
             throw new RuntimeException("App reference is null");
         }
 
         this.app = app;
-
-        if (dataHandler == null) {
-            throw new RuntimeException("DataHandler reference is null");
-        }
-
-        this.dataHandler = dataHandler;
 
         //Load fxml
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/picoral/views/main.fxml"));
@@ -209,13 +203,13 @@ public class Main extends ScrollPane {
                     //Edit
                     cm.getItems().get(0).setOnAction(e -> {
 
-                        new ViewProduct(row.getItem(), dataHandler, true);
+                        new ViewProduct(row.getItem(), true);
 
                     });
 
                     //See more
                     cm.getItems().get(1).setOnAction(e -> {
-                        new ViewProduct(row.getItem(), dataHandler);
+                        new ViewProduct(row.getItem());
                     });
 
                     //Remove
@@ -231,7 +225,7 @@ public class Main extends ScrollPane {
 
                     //Clicked twice on row
                     if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                        new ViewProduct(row.getItem(), dataHandler);
+                        new ViewProduct(row.getItem());
                     }
                 }
             });
@@ -248,7 +242,7 @@ public class Main extends ScrollPane {
 
                 case ENTER:
 
-                    new ViewProduct(current, dataHandler);
+                    new ViewProduct(current);
                     break;
 
                 case DELETE:
@@ -299,7 +293,7 @@ public class Main extends ScrollPane {
 
         //Remove by ID
         btnRemoveByID.setOnAction(e -> {
-            new RemoveBox(dataHandler);
+            new RemoveBox();
         });
 
         //Use sample data check menu item
@@ -589,10 +583,6 @@ public class Main extends ScrollPane {
             handler.loading();
 
             img.progressProperty().addListener((observable, oldValue, progress) -> {
-
-                if (oldValue.doubleValue() == 0D) {
-                    System.out.println("called");
-                }
 
                 //Update the progress bar
                 imgProgressbar.setProgress(progress.doubleValue());

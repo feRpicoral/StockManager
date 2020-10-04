@@ -35,14 +35,4 @@ public final class Constants {
             "Computer"
     };
 
-    /**
-     * Possible image formats in lower case supported by JavaFX's ImageView
-     */
-    public static final String[] VALID_IMAGE_FORMATS = {
-            "png",
-            "jgp",
-            "jpeg"
-    };
-
-
 }

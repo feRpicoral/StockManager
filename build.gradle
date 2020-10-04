@@ -32,7 +32,7 @@ jlink {
 }
 
 application {
-    mainModule = "com.picoral.main"
+    mainModule = "StockManager.main"
     mainClass = "com.picoral.core.App"
 }
 

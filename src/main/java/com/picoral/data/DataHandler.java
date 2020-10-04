@@ -9,13 +9,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.picoral.Constants.DATA_FILE_NAME;
 import static com.picoral.Constants.SAMPLE_DATA_FILE_PATH;
@@ -25,10 +22,9 @@ import static com.picoral.Constants.SAMPLE_DATA_FILE_PATH;
  */
 public class DataHandler {
 
-    private JSONObject json = new JSONObject();
+    private JSONArray json = new JSONArray(); //JSONArray obj
     private TableView<Product> table;
-    private String jsonStr;
-    private File f;
+    private File f; //Current JSON file obj - it may be the temp file if the user is using sample data
     private final List<Product> productsFromJSON = new ArrayList<>();
     private boolean isUsingSampleData = false;
 
@@ -50,7 +46,7 @@ public class DataHandler {
         productsFromJSON.clear();
 
         //Clear the table
-        resetJSONString();
+        json = new JSONArray();
         isUsingSampleData = false;
         table.getItems().clear();
 
@@ -76,26 +72,29 @@ public class DataHandler {
         save();
         table.getItems().clear();
 
-        //Reset the JSON string and object
-        resetJSONString();
         isUsingSampleData = true;
 
         try {
 
             //Load the sample data file from the resources
 
+            //Path to the sample data file
+            Path path;
+
             try {
 
-                //When running on the IDE
-                f = new File(getClass().getResource("/com/picoral/" + SAMPLE_DATA_FILE_PATH).toURI());
+                path = Path.of(getClass().getResource("/com/picoral/" + SAMPLE_DATA_FILE_PATH).toURI());
+
+                //Will throw and exception if running on jlink runtime, forcing the catch block
+                new File(path.toUri());
 
             } catch (Exception ignored) {
 
                 //When running after compiled
                 FileSystem fs = FileSystems.getFileSystem(URI.create("jrt:/"));
 
-                //Get path opbject from modules
-                Path path = fs.getPath(
+                //Get path object from modules
+                path = fs.getPath(
 
                         "/modules/" + getClass().getModule().getName(),
                         "com/picoral",
@@ -103,27 +102,19 @@ public class DataHandler {
 
                 );
 
-                //Set the sample data file to a temp file
-                //This temp file will contain the sample data, loaded from resources folder
-                f = File.createTempFile("temp", ".json");
-
-                FileWriter fw = new FileWriter(f);
-
-                fw.write(
-                        Files.readString(path)
-                );
-
-                fw.close();
-
             }
 
-            //Make sure the sample data file exists
-            if (!f.exists()) {
-                throw new RuntimeException("Sample data file was not found in resources/com/picoral/" + SAMPLE_DATA_FILE_PATH);
-            }
+            //Set the sample data file to a temp file
+            //This temp file will contain the sample data, loaded from resources folder
+            f = File.createTempFile("temp", ".json");
 
-            //Set the json string to the contents of the file
-            jsonStr = Files.lines(f.toPath()).collect(Collectors.joining(System.lineSeparator()));
+            //Populate the temp file
+            FileWriter fw = new FileWriter(f);
+            fw.write(Files.readString(path));
+            fw.close();
+
+            //Update the json obj
+            json = new JSONArray(Files.readString(Path.of(f.getPath())));
 
             //Parse the data
             parse();
@@ -171,7 +162,7 @@ public class DataHandler {
                 file.createNewFile();
 
                 FileWriter fw = new FileWriter(file);
-                fw.write("{\"products\":[]}");
+                fw.write("[]");
                 fw.close();
 
             }
@@ -179,7 +170,9 @@ public class DataHandler {
             //Set the class file to the newly created - or loaded - file
             // and set the jsonStr to the contents of this file
             f = file;
-            jsonStr = Files.lines(f.toPath()).collect(Collectors.joining(System.lineSeparator()));
+
+            //Update the json obj
+            json = new JSONArray(Files.readString(Path.of(file.getPath())));
 
             //Parse the contents of the file
             parse();
@@ -195,30 +188,10 @@ public class DataHandler {
      */
     private void parse() {
 
-        //List which will hold all the json objects (products)
-        List<JSONObject> jList = new ArrayList<>();
+        //Loop for each object (product) from json array
+        for (Object obj : json) {
 
-        try {
-
-            //If there's only one product it will be recognized as a JSONObject
-            //Otherwise it will be a JSONArray
-
-            //Current JSON as JSONObject
-            jList.add(new JSONObject(jsonStr).getJSONObject("products"));
-
-        } catch (Exception ignored) {
-
-            //Current JSON as JSONArray
-            JSONArray arr = new JSONObject(jsonStr).getJSONArray("products");
-
-            for (int i = 0; i < arr.length(); i++) {
-                jList.add(arr.getJSONObject(i));
-            }
-
-        }
-
-        //Loop for each object (product) from list
-        for (JSONObject j : jList) {
+            JSONObject j = (JSONObject) obj;
 
             //Product properties
             String name = j.getString("name");
@@ -234,7 +207,6 @@ public class DataHandler {
             Product p;
 
             JSONObject unique = j.getJSONObject("unique");
-
 
             String size, color, resolution, os;
 
@@ -290,25 +262,18 @@ public class DataHandler {
 
         }
 
+
     }
 
     /**
-     * Called when program is about to close.
      * Saves the JSONObject to the file
      */
-    public void save() {
+    private void save() {
 
         try {
 
-            jsonStr = json.toString();
-
-            FileWriter fw = new FileWriter(f);
-
-            if (jsonStr.equals("{}")) {
-                resetJSONString();
-            }
-
-            fw.write(jsonStr);
+            FileWriter fw = new FileWriter(f, false);
+            fw.write(json.toString());
             fw.close();
 
         } catch (Exception e) {
@@ -324,8 +289,9 @@ public class DataHandler {
     public void reset() {
 
         table.getItems().clear();
-        resetJSONString();
+        json = new JSONArray();
 
+        //Don't make changes to the files if using sample data
         if (isUsingSampleData) {
             return;
         }
@@ -346,7 +312,7 @@ public class DataHandler {
             this.table = table;
 
             for (Product p : productsFromJSON) {
-                addProduct(p);
+                table.getItems().add(p);
             }
 
         }
@@ -354,14 +320,18 @@ public class DataHandler {
     }
 
     /**
-     * Add product to the table.
+     * Add product to the table and if parsing mode is set to false, save this product to the JSON file
      *
      * @param product Product instance to be added
      */
     public void addProduct(Product product) {
-
         addToJson(product);
         table.getItems().add(product);
+
+        save(); //Save the changes on the fly
+
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        System.out.println(Arrays.toString(stackTraceElements));
 
     }
 
@@ -392,9 +362,10 @@ public class DataHandler {
             put("warranty", product.getWarranty());
             put("quantity", product.getQuantity());
             put("imageURL", finalImgURL);
+            put("unique", new JSONObject());
         }};
 
-        JSONObject unique = new JSONObject();
+        JSONObject unique = values.getJSONObject("unique");
 
         switch (product.getCategory()) {
             case "Computer":
@@ -439,10 +410,8 @@ public class DataHandler {
                 throw new RuntimeException("InvalidCategoryException");
         }
 
-        values.put("unique", unique);
-
         //Append to the current obj
-        json.accumulate("products", values);
+        json.put(values);
 
     }
 
@@ -495,6 +464,7 @@ public class DataHandler {
 
         removeFromJson(product);
         table.getItems().remove(product);
+        save(); //Save changes of the fly
     }
 
     /**
@@ -530,37 +500,16 @@ public class DataHandler {
      */
     private void removeFromJson(Product product) {
 
-        if (json.get("products") instanceof JSONArray) {
-            //More than one product in the list - JSONArray
+        for (int i = 0; i < json.length(); i++) {
 
-            JSONArray arr = (JSONArray) json.get("products");
+            if (((JSONObject) json.get(i)).get("id").equals(product.getID())) {
 
-            for (int i = 0; i < arr.length(); i++) {
+                json.remove(i);
 
-                if (((JSONObject) arr.get(i)).get("id").equals(product.getID())) {
-                    arr.remove(i);
-                }
-
-            }
-
-        } else {
-            //Only one product in the list - JSONObject\
-
-            if (json.getJSONObject("products").get("id").equals(product.getID())) {
-                resetJSONString();
             }
 
         }
 
     }
 
-    /**
-     * Resets the JSON String and the json variable
-     */
-    private void resetJSONString() {
-
-        jsonStr = "{\"products\":[]}";
-        json = new JSONObject(jsonStr);
-
-    }
 }

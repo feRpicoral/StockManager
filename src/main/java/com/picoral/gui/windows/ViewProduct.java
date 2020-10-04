@@ -1,6 +1,7 @@
 package com.picoral.gui.windows;
 
 import com.picoral.Util;
+import com.picoral.core.App;
 import com.picoral.data.DataHandler;
 import com.picoral.gui.popups.ChangeURL;
 import com.picoral.gui.popups.ConfirmBox;
@@ -117,10 +118,6 @@ public class ViewProduct {
             btnEdit.setOnAction(e -> {
 
                 changeEditMode();
-
-                //Make the fields editable (not disabled) and show the save button
-                btnSave.setVisible(true);
-                btnCancel.setVisible(true);
                 changeTextFieldDisabledState();
 
             });
@@ -224,6 +221,7 @@ public class ViewProduct {
 
             //Auto enter on edit mode
             if (editMode) {
+                editMode = false; //Workaround to work properly since it's inverted once changeEditMode is called
                 btnEdit.fire();
             }
 
@@ -257,7 +255,7 @@ public class ViewProduct {
                     getItems().get(0).setOnAction(e -> {
 
                         oldImage = product.getImage();
-                        new ChangeURL(dataHandler, viewWindow, product);
+                        new ChangeURL(viewWindow, product);
                         imageView.setImage(product.getImage());
 
                     });
@@ -587,7 +585,7 @@ public class ViewProduct {
 
     private final List<TextField> uniqueFields = new LinkedList<>();
     private final Stage window;
-    private final DataHandler dataHandler;
+    private final DataHandler dataHandler = App.dataHandler;
     private final Product product;
     private boolean editMode;
 
@@ -600,20 +598,13 @@ public class ViewProduct {
      * specified product and its properties
      *
      * @param product     Product to be displayed
-     * @param dataHandler DataHandler reference to save possible changes
      * @param editMode    If true, the window will open as if the edit button was clicked (on edit mode)
      */
-    public ViewProduct(Product product, DataHandler dataHandler, boolean editMode) {
+    public ViewProduct(Product product, boolean editMode) {
 
         if (!product.hasImage()) {
             product.loadImage();
         }
-
-        if (dataHandler == null) {
-            throw new RuntimeException("Data Handler reference is null");
-        }
-
-        this.dataHandler = dataHandler;
 
         this.product = product;
 
@@ -645,10 +636,9 @@ public class ViewProduct {
      * Constructor without explicit declaring the edit mode to false
      *
      * @param product     Product to display
-     * @param dataHandler DataHandler reference to be able to save possible changes
      */
-    public ViewProduct(Product product, DataHandler dataHandler) {
-        this(product, dataHandler, false);
+    public ViewProduct(Product product) {
+        this(product, false);
     }
 
     private void stop() {

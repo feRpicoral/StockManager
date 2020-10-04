@@ -11,7 +11,7 @@ import java.io.IOException;
 public class App extends Application {
 
     private Stage window;
-    public DataHandler dataHandler = new DataHandler();
+    public static final DataHandler dataHandler = new DataHandler();
 
     /**
      * Handles the request to close the program regardless from where it was called
@@ -19,8 +19,6 @@ public class App extends Application {
     @Override
     public void stop() {
 
-        //Save current data
-        dataHandler.save();
 
         //Close window
         window.close();
@@ -44,7 +42,7 @@ public class App extends Application {
 
         //Main scene
         window.setScene(new Scene(
-                new Main(this, dataHandler)
+                new Main(this)
         ));
 
         //Avoids skipping handling in stop() if closed through the X

@@ -1,5 +1,6 @@
 package com.picoral.gui.popups;
 
+import com.picoral.core.App;
 import com.picoral.data.DataHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -74,15 +75,9 @@ public class RemoveBox {
     }
 
     private final Stage window;
-    private final DataHandler dataHandler;
+    private final DataHandler dataHandler = App.dataHandler;
 
-    public RemoveBox(DataHandler dataHandler) {
-
-        if (dataHandler == null) {
-            throw new RuntimeException("DataHandler reference is null");
-        }
-
-        this.dataHandler = dataHandler;
+    public RemoveBox() {
 
         //Stage and layout initialization
         AnchorPane rb = new RemoveBoxLayout();

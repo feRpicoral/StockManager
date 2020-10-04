@@ -1,5 +1,6 @@
 package com.picoral.gui.popups;
 
+import com.picoral.core.App;
 import com.picoral.gui.windows.ViewProduct;
 import com.picoral.data.DataHandler;
 import com.picoral.models.Product;
@@ -78,7 +79,7 @@ public class ChangeURL {
 
     private final Stage window;
     private final Product product;
-    private final DataHandler dataHandler;
+    private final DataHandler dataHandler = App.dataHandler;
     private final ViewProduct viewWindow;
 
     /**
@@ -88,19 +89,13 @@ public class ChangeURL {
      * @param viewWindow  ViewProduct instance - needed to re-show the progress bar
      * @param product     Product     instance - needed to update the product's data
      */
-    public ChangeURL(DataHandler dataHandler, ViewProduct viewWindow, Product product) {
+    public ChangeURL(ViewProduct viewWindow, Product product) {
 
         if (product == null) {
             throw new RuntimeException("Product reference is null");
         }
 
         this.product = product;
-
-        if (dataHandler == null) {
-            throw new RuntimeException("DataHandler reference is null");
-        }
-
-        this.dataHandler = dataHandler;
 
         if (viewWindow == null) {
             throw new RuntimeException("ViewProduct reference is null");
